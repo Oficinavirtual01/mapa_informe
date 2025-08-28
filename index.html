@@ -1,133 +1,225 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE ANALISIS TERRITORIAL</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .header-section {
-            background-color: #004d99; /* Azul de la Policía de Mendoza */
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .header-section h1 {
-            margin: 0;
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-        .header-section p {
-            margin: 5px 0 0;
-            font-size: 1em;
-        }
-        .button-container {
-            margin-top: 25px;
-            margin-bottom: 25px;
-        }
-        .button {
-            display: inline-block;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: white;
-            background-color: #008000; /* Verde, similar a un color de alerta/acción */
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .button.github {
-            background-color: #333; /* Color de GitHub */
-        }
-        .button.alerts {
-            background-color: #ff6600; /* Naranja, para diferenciarse */
-        }
-        .button:hover {
-            background-color: #006400;
-        }
-        .button.github:hover {
-            background-color: #555;
-        }
-        .button.alerts:hover {
-            background-color: #cc5200;
-        }
-        .info-section {
-            margin-bottom: 20px;
-        }
-        .info-section h2 {
-            font-size: 1.4em;
-            color: #003366;
-            margin-top: 0;
-        }
-        .info-section p {
-            font-size: 1em;
-            color: #555;
-            line-height: 1.4;
-        }
-        .seal {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid #004d99;
-        }
-        .seal p {
-            margin: 5px 0;
-            font-size: 0.9em;
-            color: #555;
-        }
-    </style>
+  <!-- Metadatos básicos -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SAT · Sistema de Análisis Territorial</title>
+  <meta name="description" content="Patrones delictivos y rutas de patrullaje sugeridas · Jefatura de Policía de Seguridad Distrital I · Oficina Virtual de Análisis Estadístico Delictual y Operacional" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="SAT · Sistema de Análisis Territorial" />
+  <meta property="og:description" content="Estudio 15 días · Patrones delictivos y rutas de patrullaje sugeridas" />
+  <meta property="og:type" content="website" />
+  <!-- Si luego tenés una URL fija del sitio, colócala aquí -->
+  <meta property="og:url" content="https://oficinavirtual01.github.io/" />
+
+  <!-- Favicon (opcional: subí favicon.ico a la raíz del repo) -->
+  <link rel="icon" href="favicon.ico" />
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --fg:#1f2430;
+      --card:#ffffff;
+      --primary:#004d99;   /* Azul Policía de Mendoza */
+      --primary-600:#003e7d;
+      --accent:#ff6600;    /* Naranja alertas */
+      --accent-600:#cc5200;
+      --neutral-700:#333;
+      --muted:#5b657a;
+      --radius:14px;
+      --shadow:0 6px 24px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0f1420;
+        --fg:#e8edf7;
+        --card:#141a29;
+        --primary:#5aa7ff;
+        --primary-600:#4a8ed8;
+        --accent:#ff944d;
+        --accent-600:#e67d36;
+        --neutral-700:#e8edf7;
+        --muted:#a8b2c6;
+        --shadow:0 6px 24px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25);
+      }
+    }
+
+    * { box-sizing:border-box }
+    html,body { height:100% }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background:var(--bg);
+      color:var(--fg);
+      line-height:1.5;
+      letter-spacing:.2px;
+    }
+
+    .wrap{
+      max-width:960px;
+      margin-inline:auto;
+      padding:28px 20px 40px;
+      display:grid;
+      gap:20px;
+    }
+
+    header{
+      background:linear-gradient(135deg, var(--primary), var(--primary-600));
+      color:#fff;
+      padding:28px 24px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    header h1{
+      margin:0 0 6px;
+      font-size:clamp(20px, 2.4vw + 12px, 34px);
+      font-weight:800;
+      letter-spacing:.4px;
+      line-height:1.2;
+      text-transform:uppercase;
+    }
+    header p{ margin:.2rem 0; opacity:.95 }
+
+    main{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+      display:grid;
+      gap:18px;
+    }
+
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width:720px){
+      .grid{
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    section.block{
+      background:color-mix(in oklab, var(--card), var(--bg) 12%);
+      border:1px solid color-mix(in oklab, var(--primary), #0000 85%);
+      border-radius:12px;
+      padding:18px;
+    }
+    h2{
+      margin:0 0 6px;
+      font-size:clamp(16px, 1.1vw + 12px, 22px);
+      color:var(--primary-600);
+      letter-spacing:.3px;
+    }
+    .muted{ color:var(--muted); font-size:.95rem }
+
+    .btns{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:10px;
+    }
+    .btn{
+      --btn-bg: var(--neutral-700);
+      --btn-bg-h: #555;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      padding:11px 16px;
+      border-radius:12px;
+      text-decoration:none;
+      color:#fff;
+      background:var(--btn-bg);
+      font-weight:700;
+      transition: transform .06s ease, background-color .2s ease, box-shadow .2s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,.12);
+      outline: none;
+    }
+    .btn:focus-visible{ box-shadow:0 0 0 3px color-mix(in oklab, var(--primary), #fff 70%) }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:active{ transform:translateY(0) }
+
+    .btn--mapa{
+      --btn-bg:#333;         /* GitHub */
+      --btn-bg-h:#4f4f4f;
+    }
+    .btn--alertas{
+      --btn-bg:var(--accent);
+      --btn-bg-h:var(--accent-600);
+    }
+    .btn--mapa:hover{ background:var(--btn-bg-h) }
+    .btn--alertas:hover{ background:var(--btn-bg-h) }
+
+    hr.sep{
+      border:0;
+      height:1px;
+      background:linear-gradient(90deg, #0000, color-mix(in oklab, var(--primary), #000 70%), #0000);
+      margin:6px 0 2px;
+      opacity:.35;
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      font-size:.92rem;
+      padding:6px;
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <header role="banner">
+      <h1>Sistema de Análisis Territorial (SAT)</h1>
+      <p>Jefatura de Policía de Seguridad Distrital I</p>
+      <p>Oficina Virtual de Análisis Estadístico Delictual y Operacional</p>
+    </header>
 
-    <div class="container">
-        <div class="header-section">
-            <h1>SISTEMA DE ANALISIS TERRITORIAL</h1>
-            <p>JEFATURA DE POLICIA DE SEGURIDAD DISTRITAL I</p>
-            <p>OF. VIRTUAL DE ANALISIS ESTADISTICO DELICTUAL Y OPERACIONAL</p>
+    <main id="contenido" role="main" aria-labelledby="titulo-estudio">
+      <section class="block" aria-describedby="rango">
+        <h2 id="titulo-estudio">Estudio de 15 días</h2>
+        <p class="muted" id="rango">14/8 al 27/8 &middot; Patrones delictivos y rutas de patrullaje sugeridas</p>
+        <div class="btns" role="group" aria-label="Accesos principales">
+          <a class="btn btn--mapa" href="https://oficinavirtual01.github.io/PatrullagesSAT/" target="_blank" rel="noopener" aria-label="Ver mapa en GitHub Pages">
+            <!-- Pequeño ícono mapita -->
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 6l-6 2-6-2v13l6 2 6-2 6 2V8l-6-2zm0 13l-6 2V8l6-2v13z"/></svg>
+            Ver mapa
+          </a>
+          <a class="btn btn--alertas" href="https://oficinavirtual01.github.io/informedealertas/" target="_blank" rel="noopener" aria-label="Abrir informe técnico de alertas">
+            <!-- Pequeño ícono campana -->
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 005 15h14a1 1 0 00.707-1.707L18 11.586V8a6 6 0 00-6-6zm0 20a3 3 0 002.995-2.824L15 19h-2-2a3 3 0 003 3z"/></svg>
+            Informe de alertas
+          </a>
         </div>
+      </section>
 
-        <div class="info-section">
-            <h2>Estudio 15 días</h2>
-            <p>14/8 al 27/8</p>
-            <p>Patrones delictivos y Rutas de patrullaje sugeridas</p>
-        </div>
+      <section class="block" aria-label="Información institucional">
+        <h2>Información</h2>
+        <hr class="sep" />
+        <p class="muted">Enlace público de consulta. Si algún enlace no carga, verificá que el repositorio esté publicado en GitHub Pages (Settings &rarr; Pages) y sea público.</p>
+      </section>
+    </main>
 
-        <div class="button-container">
-            <a href="https://oficinavirtual01.github.io/PatrullagesSAT/" class="button github" target="_blank">VER MAPA</a>
-        </div>
+    <footer role="contentinfo">
+      OF. VIRTUAL DE ANÁLISIS ESTADÍSTICO DELICTUAL Y OPERACIONAL · SAT
+    </footer>
+  </div>
 
-        <hr style="border-top: 1px solid #ddd; margin: 40px 0;">
-
-        <div class="info-section">
-            <h2 style="color: #ff6600;">INFORME SAT – Resumen técnico de alertas</h2>
-        </div>
-        
-        <div class="button-container">
-            <a href="https://oficinavirtual01.github.io/informedealertas/" class="button alerts" target="_blank">Informe de Alertas</a>
-        </div>
-
-        <div class="seal">
-            <p>OF. VIRTUAL DE ANALISIS ESTADISTICO DELICTUAL Y OPERACIONAL</p>
-        </div>
-    </div>
-
+  <!-- Opcional: si querés setear dinámicamente el rango de 15 días, descomentá este script -->
+  <!--
+  <script>
+    (function(){
+      const fmt = d => `${d.getDate()}/${d.getMonth()+1}`;
+      const hoy = new Date();
+      const inicio = new Date(hoy); inicio.setDate(hoy.getDate()-14);
+      const r = document.getElementById('rango');
+      if (r) r.textContent = `${fmt(inicio)} al ${fmt(hoy)} · Patrones delictivos y rutas de patrullaje sugeridas`;
+    })();
+  </script>
+  -->
 </body>
 </html>
 
