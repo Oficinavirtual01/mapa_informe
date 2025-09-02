@@ -1,225 +1,683 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- Metadatos básicos -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SAT · Sistema de Análisis Territorial</title>
-  <meta name="description" content="Patrones delictivos y rutas de patrullaje sugeridas · Jefatura de Policía de Seguridad Distrital I · Oficina Virtual de Análisis Estadístico Delictual y Operacional" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAT – Sistema de Análisis Territorial</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<style>
+  :root { --sat-muted:#6c757d; --sat-brand:#0d6efd; }
+  body { font-size: 0.9rem; background:#f8f9fa; }
+  .map-container { height: 440px; margin-bottom:16px; }
+  .brand { font-weight:700; }
+  .subtle { color: var(--sat-muted); }
+  footer { font-size:0.8rem; text-align:center; margin:24px 0 8px; color:#666; }
+  .btn-whatsapp { background:#25d366; color:white; font-weight:bold; }
+  .badge-kpi { font-weight:600; font-size:.9rem; }
+  .row-gap { row-gap: .75rem; }
+  .table-sm td, .table-sm th { vertical-align: top; }
+  .btn-toggle { min-width: 135px; }
 
-  <!-- Open Graph / Social -->
-  <meta property="og:title" content="SAT · Sistema de Análisis Territorial" />
-  <meta property="og:description" content="Estudio 15 días · Patrones delictivos y rutas de patrullaje sugeridas" />
-  <meta property="og:type" content="website" />
-  <!-- Si luego tenés una URL fija del sitio, colócala aquí -->
-  <meta property="og:url" content="https://oficinavirtual01.github.io/" />
-
-  <!-- Favicon (opcional: subí favicon.ico a la raíz del repo) -->
-  <link rel="icon" href="favicon.ico" />
-
-  <style>
-    :root{
-      --bg:#f5f7fb;
-      --fg:#1f2430;
-      --card:#ffffff;
-      --primary:#004d99;   /* Azul Policía de Mendoza */
-      --primary-600:#003e7d;
-      --accent:#ff6600;    /* Naranja alertas */
-      --accent-600:#cc5200;
-      --neutral-700:#333;
-      --muted:#5b657a;
-      --radius:14px;
-      --shadow:0 6px 24px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
-    }
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg:#0f1420;
-        --fg:#e8edf7;
-        --card:#141a29;
-        --primary:#5aa7ff;
-        --primary-600:#4a8ed8;
-        --accent:#ff944d;
-        --accent-600:#e67d36;
-        --neutral-700:#e8edf7;
-        --muted:#a8b2c6;
-        --shadow:0 6px 24px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25);
-      }
-    }
-
-    * { box-sizing:border-box }
-    html,body { height:100% }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-      background:var(--bg);
-      color:var(--fg);
-      line-height:1.5;
-      letter-spacing:.2px;
-    }
-
-    .wrap{
-      max-width:960px;
-      margin-inline:auto;
-      padding:28px 20px 40px;
-      display:grid;
-      gap:20px;
-    }
-
-    header{
-      background:linear-gradient(135deg, var(--primary), var(--primary-600));
-      color:#fff;
-      padding:28px 24px;
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    header h1{
-      margin:0 0 6px;
-      font-size:clamp(20px, 2.4vw + 12px, 34px);
-      font-weight:800;
-      letter-spacing:.4px;
-      line-height:1.2;
-      text-transform:uppercase;
-    }
-    header p{ margin:.2rem 0; opacity:.95 }
-
-    main{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:22px;
-      display:grid;
-      gap:18px;
-    }
-
-    .grid{
-      display:grid;
-      gap:14px;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width:720px){
-      .grid{
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    section.block{
-      background:color-mix(in oklab, var(--card), var(--bg) 12%);
-      border:1px solid color-mix(in oklab, var(--primary), #0000 85%);
-      border-radius:12px;
-      padding:18px;
-    }
-    h2{
-      margin:0 0 6px;
-      font-size:clamp(16px, 1.1vw + 12px, 22px);
-      color:var(--primary-600);
-      letter-spacing:.3px;
-    }
-    .muted{ color:var(--muted); font-size:.95rem }
-
-    .btns{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:10px;
-    }
-    .btn{
-      --btn-bg: var(--neutral-700);
-      --btn-bg-h: #555;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:.5rem;
-      padding:11px 16px;
-      border-radius:12px;
-      text-decoration:none;
-      color:#fff;
-      background:var(--btn-bg);
-      font-weight:700;
-      transition: transform .06s ease, background-color .2s ease, box-shadow .2s ease;
-      box-shadow: 0 2px 10px rgba(0,0,0,.12);
-      outline: none;
-    }
-    .btn:focus-visible{ box-shadow:0 0 0 3px color-mix(in oklab, var(--primary), #fff 70%) }
-    .btn:hover{ transform:translateY(-1px) }
-    .btn:active{ transform:translateY(0) }
-
-    .btn--mapa{
-      --btn-bg:#333;         /* GitHub */
-      --btn-bg-h:#4f4f4f;
-    }
-    .btn--alertas{
-      --btn-bg:var(--accent);
-      --btn-bg-h:var(--accent-600);
-    }
-    .btn--mapa:hover{ background:var(--btn-bg-h) }
-    .btn--alertas:hover{ background:var(--btn-bg-h) }
-
-    hr.sep{
-      border:0;
-      height:1px;
-      background:linear-gradient(90deg, #0000, color-mix(in oklab, var(--primary), #000 70%), #0000);
-      margin:6px 0 2px;
-      opacity:.35;
-    }
-
-    footer{
-      text-align:center;
-      color:var(--muted);
-      font-size:.92rem;
-      padding:6px;
-    }
-  </style>
+  .leaflet-control.filter-chip {
+    background: rgba(255,255,255,.92);
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    padding: 6px 10px;
+    font-size: .85rem;
+    max-width: 360px;
+    line-height: 1.2;
+  }
+  .leaflet-control.filter-chip b { color: #0d6efd; }
+</style>
 </head>
-<body>
-  <div class="wrap">
-    <header role="banner">
-      <h1>Sistema de Análisis Territorial (SAT)</h1>
-      <p>Jefatura de Policía de Seguridad Distrital I</p>
-      <p>Oficina Virtual de Análisis Estadístico Delictual y Operacional</p>
-    </header>
+<body class="container py-3">
 
-    <main id="contenido" role="main" aria-labelledby="titulo-estudio">
-      <section class="block" aria-describedby="rango">
-        <h2 id="titulo-estudio">Estudio de 15 días</h2>
-        <p class="muted" id="rango">14/8 al 27/8 &middot; Patrones delictivos y rutas de patrullaje sugeridas</p>
-        <div class="btns" role="group" aria-label="Accesos principales">
-          <a class="btn btn--mapa" href="https://oficinavirtual01.github.io/PatrullagesSAT/" target="_blank" rel="noopener" aria-label="Ver mapa en GitHub Pages">
-            <!-- Pequeño ícono mapita -->
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 6l-6 2-6-2v13l6 2 6-2 6 2V8l-6-2zm0 13l-6 2V8l6-2v13z"/></svg>
-            Ver mapa
-          </a>
-          <a class="btn btn--alertas" href="https://oficinavirtual01.github.io/informedealertas/" target="_blank" rel="noopener" aria-label="Abrir informe técnico de alertas">
-            <!-- Pequeño ícono campana -->
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 005 15h14a1 1 0 00.707-1.707L18 11.586V8a6 6 0 00-6-6zm0 20a3 3 0 002.995-2.824L15 19h-2-2a3 3 0 003 3z"/></svg>
-            Informe de alertas
-          </a>
-        </div>
-      </section>
-
-      <section class="block" aria-label="Información institucional">
-        <h2>Información</h2>
-        <hr class="sep" />
-        <p class="muted">Enlace público de consulta. Si algún enlace no carga, verificá que el repositorio esté publicado en GitHub Pages (Settings &rarr; Pages) y sea público.</p>
-      </section>
-    </main>
-
-    <footer role="contentinfo">
-      OF. VIRTUAL DE ANÁLISIS ESTADÍSTICO DELICTUAL Y OPERACIONAL · SAT
-    </footer>
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+    <h4 class="m-0 brand">SAT – Sistema de Análisis Territorial <sup>©</sup></h4>
+    <div class="text-end">
+      <div class="small">CENTRO DE OPERACIONES</div>
+      <div class="small">Corte: <span class="subtle">02/09/2025 18:19</span></div>
+      <div class="small">
+        Periodo (ALERTAS):
+        <span class="subtle">
+          22/07/2025 – 02/09/2025
+        </span>
+        · Eventos: <span class="subtle">259</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Opcional: si querés setear dinámicamente el rango de 15 días, descomentá este script -->
-  <!--
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <span class="badge bg-primary badge-kpi">Alertas: <span id="kpiAlertas">39</span></span>
+    <span class="badge bg-secondary badge-kpi">Eventos: <span id="kpiEventos">178</span></span>
+    <span id="kpiDia" class="badge bg-info text-dark badge-kpi d-none">
+      Día: <span id="kpiDiaVal"></span>
+    </span>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="row row-gap mb-2">
+    <div class="col-6 col-md-3">
+      <label class="form-label">Desde</label>
+      <input type="date" id="fDesde" class="form-control form-control-sm">
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="form-label">Hasta</label>
+      <input type="date" id="fHasta" class="form-control form-control-sm">
+    </div>
+
+    <div class="col-6 col-md-3">
+      <label class="form-label">Distrito</label>
+      <select id="fComis" class="form-select form-select-sm"><option value="">(todos)</option></select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <label class="form-label">Franja</label>
+      <select id="fFranja" class="form-select form-select-sm">
+        <option value="">(todas)</option>
+        <option>Madrugada</option>
+        <option>Mañana</option>
+        <option>Tarde</option>
+        <option>Noche</option>
+      </select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <label class="form-label">Día</label>
+      <select id="fDia" class="form-select form-select-sm">
+        <option value="">(todos)</option>
+        <option>Lunes</option>
+        <option>Martes</option>
+        <option>Miércoles</option>
+        <option>Jueves</option>
+        <option>Viernes</option>
+        <option>Sábado</option>
+        <option>Domingo</option>
+      </select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <label class="form-label">Eventos (ventana)</label>
+      <select id="fVentana" class="form-select form-select-sm">
+        <option value="">(usar rango)</option>
+        <option value="1">24 hs</option>
+        <option value="2">48 hs</option>
+        <option value="3">72 hs</option>
+        <option value="7">7 días</option>
+        <option value="15">15 días</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- MAPA -->
+  <div id="map" class="map-container border rounded"></div>
+
+  <!-- TOGGLES -->
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <button class="btn btn-sm btn-outline-secondary btn-toggle" id="btnBase">🗺️ OSM</button>
+    <button class="btn btn-sm btn-outline-secondary btn-toggle" id="btnHybrid">🛰️ Satélite + Calles</button>
+    <button class="btn btn-sm btn-outline-primary btn-toggle" id="btnHeat">🔥 Heatmap ON/OFF</button>
+    <button class="btn btn-sm btn-outline-dark btn-toggle" id="btnPolys">⬛ Polígonos ON/OFF</button>
+    <button class="btn btn-sm btn-outline-primary btn-toggle" id="btnCircles">🔵 Círculos ON/OFF</button>
+    <button class="btn btn-sm btn-outline-danger btn-toggle" id="btnDelitos">🔴 Eventos Estudio ON/OFF</button>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <label for="sPt" class="form-label m-0">Tamaño puntos/heat</label>
+    <input type="range" id="sPt" class="form-range" min="2" max="18" step="1" value="4" style="width:220px">
+    <span id="sPtVal" class="small text-muted">4</span>
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Distrito</th><th>Comisaría</th><th>Zona</th><th>Franja</th>
+          <th>Rango</th><th>Radio (m)</th><th>Eventos</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <footer>
+    © SAT – Sistema de Análisis Territorial | Lic. Sebastián González
+  </footer>
+
+  <!-- Libs -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/wellknown@0.5.0/wellknown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
   <script>
-    (function(){
-      const fmt = d => `${d.getDate()}/${d.getMonth()+1}`;
-      const hoy = new Date();
-      const inicio = new Date(hoy); inicio.setDate(hoy.getDate()-14);
-      const r = document.getElementById('rango');
-      if (r) r.textContent = `${fmt(inicio)} al ${fmt(hoy)} · Patrones delictivos y rutas de patrullaje sugeridas`;
-    })();
+  // ===== Datos inyectados desde Apps Script =====
+  window.SAT = window.SAT || {};
+  SAT.DATA    = [{"Alerta_ID":"ALR_450m_11/08/2025_-32.87004_-68.84274_5 // Zona 25 de Mayo 2798","Fecha":"2025-08-11T03:00:00.000Z","Día":"Lunes (40%)","Franja":"🌆 Noche (60%)","Rango_horario_total":"22:20–21:00","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":5,"Comisaria":"Cria__4","Distrito":"Capital","Zona_centroide":"25 de Mayo 2798","Calles_triangulacion":"F J Moyano 2999 / Avenida Perú 2906 / Videla Correa 628 / Félix Bogado 420 / Carlos Pellegrini 445","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.867591,-68.845881/-32.869285,-68.843255/-32.870485,-68.843048/-32.870063,-68.839984/-32.872752,-68.841552","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.845881 -32.867591, -68.841552 -32.872752, -68.839984 -32.870063, -68.845881 -32.867591))","Centroide_lat":-32.8700352,"Centroide_lng":-68.84274400000001,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_08/08/2025_-32.87686_-68.83432_7 // Zona Rioja 2269","Fecha":"2025-08-08T03:00:00.000Z","Día":"Domingo (29%)","Franja":"🌆 Noche (43%)","Rango_horario_total":"20:45–09:00","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":7,"Comisaria":"Cria__4","Distrito":"Capital","Zona_centroide":"Rioja 2269","Calles_triangulacion":"Avenida San Martín 2389 / Avenida San Martín 2097 / José Federico Moreno 2301 / Ayacucho 198 / Maipú 325 / R Escalada 2215 / Avenida San Martín 2112","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.875326,-68.835127/-32.878716,-68.835925/-32.876508,-68.832185/-32.875105,-68.83356/-32.876655,-68.831932/-32.877258,-68.835292/-32.878445,-68.836185","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.836185 -32.878445, -68.835925 -32.878716, -68.831932 -32.876655, -68.83356 -32.875105, -68.835127 -32.875326, -68.836185 -32.878445))","Centroide_lat":-32.876859,"Centroide_lng":-68.83431514285714,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_04/08/2025_-32.86875_-68.82422_3 // Zona Gobernador González 715","Fecha":"2025-08-04T03:00:00.000Z","Día":"Martes (33%)","Franja":"🌆 Noche (67%)","Rango_horario_total":"22:30–19:15","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria__4","Distrito":"Capital","Zona_centroide":"Gobernador González 715","Calles_triangulacion":"Gobernador González 557 / Fray Mamerto Esquiú 801-899 / C Ferroviaria 764","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.868992,-68.826454/-32.869494,-68.822922/-32.867755,-68.823296","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.826454 -32.868992, -68.822922 -32.869494, -68.823296 -32.867755, -68.826454 -32.868992))","Centroide_lat":-32.868747,"Centroide_lng":-68.824224,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_19/08/2025_-32.87379_-68.82909_4 // Zona Tucumán 422","Fecha":"2025-08-19T03:00:00.000Z","Día":"Sábado (50%)","Franja":"🌆 Noche (50%)","Rango_horario_total":"21:50–18:50","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":4,"Comisaria":"Cria__4","Distrito":"Capital","Zona_centroide":"Tucumán 422","Calles_triangulacion":"Ituzaingó 2537 / Paraguay 2390 / Santa Fe 329 / Montecaseros 2683","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.874051,-68.829278/-32.875765,-68.826508/-32.873117,-68.830109/-32.872224,-68.830453","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.830453 -32.872224, -68.830109 -32.873117, -68.829278 -32.874051, -68.826508 -32.875765, -68.830453 -32.872224))","Centroide_lat":-32.87378925,"Centroide_lng":-68.829087,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_06/08/2025_-32.86515_-68.83614_4 // Zona Damián Hudson 223","Fecha":"2025-08-06T03:00:00.000Z","Día":"Jueves (25%)","Franja":"🌆 Noche (50%)","Rango_horario_total":"05:00–21:20","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":4,"Comisaria":"Cria__4","Distrito":"Capital","Zona_centroide":"Damián Hudson 223","Calles_triangulacion":"Avenida Bartolomé Mitre 3380 / José Manuel Estrada 237 / José Manuel Estrada 192 / 9 de Julio 3104","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.864593,-68.838529/-32.864360000000005,-68.836013/-32.864873,-68.835419/-32.866781,-68.834593","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.838529 -32.864593, -68.834593 -32.866781, -68.835419 -32.864873, -68.836013 -32.864360000000005, -68.838529 -32.864593))","Centroide_lat":-32.86515175,"Centroide_lng":-68.83613849999999,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_13/08/2025_-32.87198_-68.83629_3 // Zona 9 de Julio 2668","Fecha":"2025-08-13T03:00:00.000Z","Día":"Jueves (33%)","Franja":"🌆 Noche (33%)","Rango_horario_total":"20:35–16:00","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria__4","Distrito":"Capital","Zona_centroide":"9 de Julio 2668","Calles_triangulacion":"Echeverría 27 / Echeverría 63 / Gutenberg 290","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.87152,-68.83498/-32.871304,-68.835361/-32.873126,-68.838528","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.838528 -32.873126, -68.83498 -32.87152, -68.835361 -32.871304, -68.838528 -32.873126))","Centroide_lat":-32.87198333333333,"Centroide_lng":-68.83628966666667,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_15/08/2025_-32.88233_-68.83274_5 // Zona Corrientes 292","Fecha":"2025-08-15T03:00:00.000Z","Día":"Miércoles (40%)","Franja":"☀️ Tarde (40%)","Rango_horario_total":"14:30–11:00","Rango_operativo_SAT":"12:00–17:59","Radio_m":450,"Cantidad_eventos":5,"Comisaria":"EPOA 1","Distrito":"Capital","Zona_centroide":"Corrientes 292","Calles_triangulacion":"Juan B. Alberdi 51 / Ituzaingó 1723 / Salta 1771 / Córdoba 403 / José Federico Moreno 1907","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.879821,-68.835636/-32.884215,-68.829826/-32.882899,-68.83353/-32.883653,-68.832315/-32.881084,-68.832409","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.835636 -32.879821, -68.83353 -32.882899, -68.832315 -32.883653, -68.829826 -32.884215, -68.832409 -32.881084, -68.835636 -32.879821))","Centroide_lat":-32.882334400000005,"Centroide_lng":-68.83274320000001,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_23/07/2025_-32.87513_-68.87186_3 // Zona Ascasubi 1099","Fecha":"2025-07-23T03:00:00.000Z","Día":"Miércoles (67%)","Franja":"🌆 Noche (67%)","Rango_horario_total":"09:00–20:00","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria__6","Distrito":"Capital","Zona_centroide":"Ascasubi 1099","Calles_triangulacion":"Ascasubi 1099 / Posta del Retamo 1615 / Calle 2 1117","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.874733,-68.873067/-32.877482,-68.871934/-32.873178,-68.870571","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.873067 -32.874733, -68.871934 -32.877482, -68.870571 -32.873178, -68.873067 -32.874733))","Centroide_lat":-32.875131,"Centroide_lng":-68.87185733333332,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_12/08/2025_-32.89177_-68.85513_8 // Zona Olascoaga 736","Fecha":"2025-08-12T03:00:00.000Z","Día":"Miércoles (50%)","Franja":"🌆 Noche (50%)","Rango_horario_total":"18:00–01:20","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":8,"Comisaria":"Cria__5","Distrito":"Capital","Zona_centroide":"Olascoaga 736","Calles_triangulacion":"Arístides Villanueva 256 / Rufino Ortega 471 / Martín Zapata 205 / Martínez de Rozas 735 / Julio Argentino Roca 262 / J. y M. Clark 386 / Olascoaga 808 / Olascoaga 605","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.89262,-68.85393/-32.890547,-68.857363/-32.890328,-68.853143/-32.89155,-68.856411/-32.889511,-68.853574/-32.895152,-68.857072/-32.891023,-68.854534/-32.893431,-68.854997","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.857363 -32.890547, -68.857072 -32.895152, -68.85393 -32.89262, -68.853143 -32.890328, -68.853574 -32.889511, -68.857363 -32.890547))","Centroide_lat":-32.89177025,"Centroide_lng":-68.855128,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_07/08/2025_-32.89702_-68.85634_4 // Zona Vicente Gil 366","Fecha":"2025-08-07T03:00:00.000Z","Día":"Sábado (50%)","Franja":"🌆 Noche (50%)","Rango_horario_total":"22:30–19:40","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":4,"Comisaria":"Cria__5","Distrito":"Capital","Zona_centroide":"Vicente Gil 366","Calles_triangulacion":"Olascoaga 268 / Coronel Rodríguez 240 / Sobremonte 502 / Vicente Gil 505","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.89741,-68.855695/-32.897892,-68.854079/-32.895904,-68.857463/-32.896865,-68.85811000000001","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.85811000000001 -32.896865, -68.854079 -32.897892, -68.857463 -32.895904, -68.85811000000001 -32.896865))","Centroide_lat":-32.897017749999996,"Centroide_lng":-68.85633675,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_07/08/2025_-32.89734_-68.86243_4 // Zona Emilio Jofré 252","Fecha":"2025-08-07T03:00:00.000Z","Día":"Viernes (50%)","Franja":"🌆 Noche (75%)","Rango_horario_total":"22:50–18:00","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":4,"Comisaria":"Cria__5","Distrito":"Capital","Zona_centroide":"Emilio Jofré 252","Calles_triangulacion":"Lamadrid 699 / Pueyrredón 812 / B Sur Mer 361 / Avenida Boulogne Sur Mer 364","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.89796,-68.860875/-32.899495,-68.862605/-32.896124,-68.862897/-32.895769,-68.863355","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.863355 -32.895769, -68.862605 -32.899495, -68.860875 -32.89796, -68.862897 -32.896124, -68.863355 -32.895769))","Centroide_lat":-32.897337,"Centroide_lng":-68.862433,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_06/08/2025_-32.88615_-68.85203_3 // Zona Coronel Rodríguez 2634","Fecha":"2025-08-06T03:00:00.000Z","Día":"Martes (33%)","Franja":"🌆 Noche (67%)","Rango_horario_total":"01:10–20:20","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria__5","Distrito":"Capital","Zona_centroide":"Coronel Rodríguez 2634","Calles_triangulacion":"Julio Leónidas Aguirre 67 / Julio Leónidas Aguirre 309 / Avenida Emilio Civit 200","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.885182,-68.849963/-32.885144,-68.853509/-32.88811,-68.852627","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.853509 -32.885144, -68.852627 -32.88811, -68.849963 -32.885182, -68.853509 -32.885144))","Centroide_lat":-32.88614533333333,"Centroide_lng":-68.852033,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_25/07/2025_-32.94197_-68.84892_4 // Zona Rafael Obligado 93","Fecha":"2025-07-25T03:00:00.000Z","Día":"Miércoles (50%)","Franja":"🌙 Madrugada (75%)","Rango_horario_total":"23:20–04:00","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":4,"Comisaria":"Cria__7","Distrito":"Godoy Cruz","Zona_centroide":"Rafael Obligado 93","Calles_triangulacion":"Perito Moreno 1612 / Francisco Civit 1631 / Perito Moreno 1584 / Perito Moreno 1551","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.942775,-68.848214/-32.940265,-68.850782/-32.942574,-68.848233/-32.942269,-68.848462","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.850782 -32.940265, -68.848214 -32.942775, -68.848233 -32.942574, -68.848462 -32.942269, -68.850782 -32.940265))","Centroide_lat":-32.94197075,"Centroide_lng":-68.84892275,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_09/08/2025_-32.93494_-68.84769_6 // Zona Estrada 76","Fecha":"2025-08-09T03:00:00.000Z","Día":"Domingo (33%)","Franja":"🌙 Madrugada (67%)","Rango_horario_total":"03:30–21:30","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":6,"Comisaria":"Cria__7","Distrito":"Godoy Cruz","Zona_centroide":"Estrada 76","Calles_triangulacion":"Perito Moreno 1037 / Avenida San Martín Sur 859 / Colón 901 / Hualpa 120 / Sargento Cabral 792 / Colón 788","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.936566,-68.847003/-32.93473,-68.850249/-32.935088,-68.84815/-32.934593,-68.848268/-32.934769,-68.845057/-32.933924,-68.847403","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.850249 -32.93473, -68.847003 -32.936566, -68.845057 -32.934769, -68.847403 -32.933924, -68.850249 -32.93473))","Centroide_lat":-32.934945,"Centroide_lng":-68.84768833333332,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_05/08/2025_-32.92701_-68.84359_3 // Zona Azcuénaga 46","Fecha":"2025-08-05T03:00:00.000Z","Día":"Miércoles (67%)","Franja":"🌙 Madrugada (67%)","Rango_horario_total":"20:30–00:30","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria__7","Distrito":"Godoy Cruz","Zona_centroide":"Azcuénaga 46","Calles_triangulacion":"Perito Moreno 329 / Figueroa Alcorta 135 / Colón 45","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.9287,-68.844854/-32.92712,-68.84081/-32.925212,-68.84511","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.84511 -32.925212, -68.844854 -32.9287, -68.84081 -32.92712, -68.84511 -32.925212))","Centroide_lat":-32.92701066666667,"Centroide_lng":-68.84359133333334,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_19/08/2025_-32.93802_-68.85226_3 // Zona Córdoba 421","Fecha":"2025-08-19T03:00:00.000Z","Día":"Martes (100%)","Franja":"🌙 Madrugada (67%)","Rango_horario_total":"04:10–17:30","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria__7","Distrito":"Godoy Cruz","Zona_centroide":"Córdoba 421","Calles_triangulacion":"José Ingenieros 198 / Manuel García 1302 / Tiburcio Benegas 495","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.939106,-68.850469/-32.93769,-68.853169/-32.937249,-68.853137","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.853169 -32.93769, -68.850469 -32.939106, -68.853137 -32.937249, -68.853169 -32.93769))","Centroide_lat":-32.93801500000001,"Centroide_lng":-68.85225833333334,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_09/08/2025_-32.94320_-68.85674_5 // Zona Chubut 1802","Fecha":"2025-08-09T03:00:00.000Z","Día":"Sábado (40%)","Franja":"🌙 Madrugada (80%)","Rango_horario_total":"17:00–05:10","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":5,"Comisaria":"Cria__7","Distrito":"Godoy Cruz","Zona_centroide":"Chubut 1802","Calles_triangulacion":"Joaquín V. González 1597 / Lago Olmos 1985 / Neuquén 879 / Genner 1757 / Chubut 1950","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.940398,-68.858105/-32.945,-68.859172/-32.943314,-68.855738/-32.942172,-68.854343/-32.945116,-68.856351","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.859172 -32.945, -68.856351 -32.945116, -68.854343 -32.942172, -68.858105 -32.940398, -68.859172 -32.945))","Centroide_lat":-32.943200000000004,"Centroide_lng":-68.8567418,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_28/07/2025_-32.94849_-68.85655_3 // Zona Lago Alumine 2222","Fecha":"2025-07-28T03:00:00.000Z","Día":"Sábado (33%)","Franja":"🌙 Madrugada (33%)","Rango_horario_total":"16:40–05:00","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_40","Distrito":"Godoy Cruz","Zona_centroide":"Lago Alumine 2222","Calles_triangulacion":"Laguna Verde 930 / Lago Hermoso 1051 / Entre Ríos 2222","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.95035,-68.857242/-32.947253,-68.857893/-32.947859,-68.854526","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.857893 -32.947253, -68.857242 -32.95035, -68.854526 -32.947859, -68.857893 -32.947253))","Centroide_lat":-32.94848733333334,"Centroide_lng":-68.85655366666667,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_05/08/2025_-32.91688_-68.86041_4 // Zona Picheuta 845","Fecha":"2025-08-05T03:00:00.000Z","Día":"Jueves (25%)","Franja":"🌆 Noche (50%)","Rango_horario_total":"22:30–12:35","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":4,"Comisaria":"Cria_27","Distrito":"Godoy Cruz","Zona_centroide":"Picheuta 845","Calles_triangulacion":"Renato Della Santa 776 / Paso de los Andes 1119 / Reconquista 1530 / Paso de los Andes 902","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.917712,-68.861321/-32.914389,-68.859313/-32.919452,-68.861536/-32.91597,-68.859462","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.861536 -32.919452, -68.859462 -32.91597, -68.859313 -32.914389, -68.861321 -32.917712, -68.861536 -32.919452))","Centroide_lat":-32.916880750000004,"Centroide_lng":-68.860408,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_07/08/2025_-32.90497_-68.87139_5 // Zona Lamadrid 2275","Fecha":"2025-08-07T03:00:00.000Z","Día":"Miércoles (20%)","Franja":"🌤️ Mañana (40%)","Rango_horario_total":"10:00–13:35","Rango_operativo_SAT":"06:00–11:59","Radio_m":450,"Cantidad_eventos":5,"Comisaria":"Cria_27","Distrito":"Godoy Cruz","Zona_centroide":"Lamadrid 2275","Calles_triangulacion":"Lamadrid 2407 / Huarpes 2512 / Lautaro 2329 / Lamadrid 2013","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.905038,-68.872942/-32.903135,-68.873833/-32.906422,-68.872566/-32.905141,-68.86888/-32.905128,-68.86875","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.873833 -32.903135, -68.872566 -32.906422, -68.86875 -32.905128, -68.873833 -32.903135))","Centroide_lat":-32.904972799999996,"Centroide_lng":-68.87139420000001,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_06/08/2025_-32.90388_-68.86434_5 // Zona Pedro J. Godoy 1778","Fecha":"2025-08-06T03:00:00.000Z","Día":"Sábado (40%)","Franja":"🌆 Noche (40%)","Rango_horario_total":"00:30–08:00","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":5,"Comisaria":"Cria_27","Distrito":"Godoy Cruz","Zona_centroide":"Pedro J. Godoy 1778","Calles_triangulacion":"Boulogne Sur Mer 1710 / Santiago del Estero 2058 / Colombia 1604 / Pedro J. Godoy 1664 / Colombia 1741","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.902586,-68.864298/-32.901686,-68.868331/-32.905724,-68.862133/-32.903689,-68.863112/-32.905728,-68.863813","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.868331 -32.901686, -68.863813 -32.905728, -68.862133 -32.905724, -68.863112 -32.903689, -68.864298 -32.902586, -68.868331 -32.901686))","Centroide_lat":-32.903882599999996,"Centroide_lng":-68.8643374,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_28/07/2025_-32.86210_-68.86344_3 // Zona Valle Grande 2524","Fecha":"2025-07-28T03:00:00.000Z","Día":"Domingo (33%)","Franja":"🌤️ Mañana (67%)","Rango_horario_total":"05:05–09:35","Rango_operativo_SAT":"06:00–11:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_33","Distrito":"Capital","Zona_centroide":"Valle Grande 2524","Calles_triangulacion":"Los Condores 26 / Los Reyunos 2880 / C del Plata c18","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.863221,-68.861426/-32.860788,-68.864744/-32.862282,-68.864161","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.864744 -32.860788, -68.864161 -32.862282, -68.861426 -32.863221, -68.864744 -32.860788))","Centroide_lat":-32.862097,"Centroide_lng":-68.86344366666667,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_09/08/2025_-32.91870_-68.84968_3 // Zona Echeverría 490","Fecha":"2025-08-09T03:00:00.000Z","Día":"Viernes (33%)","Franja":"🌙 Madrugada (33%)","Rango_horario_total":"00:30–11:30","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_34","Distrito":"Godoy Cruz","Zona_centroide":"Echeverría 490","Calles_triangulacion":"20 de Junio 198 / Chacabuco 219 / Beltrán 257","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.918491,-68.849428/-32.916721,-68.849475/-32.920879,-68.85013","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.85013 -32.920879, -68.849428 -32.918491, -68.849475 -32.916721, -68.85013 -32.920879))","Centroide_lat":-32.918697,"Centroide_lng":-68.84967766666666,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_06/08/2025_-32.90871_-68.85075_8 // Zona Arizu 550","Fecha":"2025-08-06T03:00:00.000Z","Día":"Miércoles (25%)","Franja":"🌙 Madrugada (50%)","Rango_horario_total":"18:20–01:00","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":8,"Comisaria":"Cria_34","Distrito":"Godoy Cruz","Zona_centroide":"Arizu 550","Calles_triangulacion":"Del Valle Iberlucea 1510 / Pellegrini 802 / Beltrán 1671 / Pasaje Salinas 1331 / Echeverría 1554 / Pellegrini 909 / Maipú 235 / Ameghino 1431","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.908137,-68.850512/-32.908304,-68.853998/-32.906953,-68.85144/-32.909843,-68.849215/-32.908232,-68.848085/-32.908175,-68.855279/-32.910873,-68.848275/-32.909184,-68.849207","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.855279 -32.908175, -68.848275 -32.910873, -68.848085 -32.908232, -68.85144 -32.906953, -68.855279 -32.908175))","Centroide_lat":-32.908712625,"Centroide_lng":-68.850751375,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_08/08/2025_-32.90723_-68.84425_3 // Zona Juan B. Justo 36","Fecha":"2025-08-08T03:00:00.000Z","Día":"Viernes (67%)","Franja":"☀️ Tarde (67%)","Rango_horario_total":"16:00–13:00","Rango_operativo_SAT":"12:00–17:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_34","Distrito":"Godoy Cruz","Zona_centroide":"Juan B. Justo 36","Calles_triangulacion":"Avenida San Martín 1658 / Almirante Brown 1901 / Belgrano 1413","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.907585,-68.844108/-32.905006,-68.846081/-32.909093,-68.84255999999999","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.846081 -32.905006, -68.844108 -32.907585, -68.84255999999999 -32.909093, -68.846081 -32.905006))","Centroide_lat":-32.907227999999996,"Centroide_lng":-68.84424966666667,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_18/08/2025_-32.94822_-68.82107_4 // Zona Chivilcoy 2347","Fecha":"2025-08-18T03:00:00.000Z","Día":"Lunes (50%)","Franja":"🌆 Noche (50%)","Rango_horario_total":"19:00–20:55","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":4,"Comisaria":"Cria_37","Distrito":"Godoy Cruz","Zona_centroide":"Chivilcoy 2347","Calles_triangulacion":"Cañuelas 1545 / Arrecifes 1347 / Del Valle Aristobulo 2135 / Aristóbulo Del Valle 2400","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.948486,-68.820146/-32.94633,-68.820063/-32.949134,-68.823532/-32.948931,-68.82053","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.823532 -32.949134, -68.82053 -32.948931, -68.820146 -32.948486, -68.820063 -32.94633, -68.823532 -32.949134))","Centroide_lat":-32.948220250000006,"Centroide_lng":-68.82106775,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_02/08/2025_-32.93108_-68.87101_9 // Zona Punta Arenas 834-898","Fecha":"2025-08-02T03:00:00.000Z","Día":"Sábado (44%)","Franja":"🌤️ Mañana (44%)","Rango_horario_total":"06:45–07:20","Rango_operativo_SAT":"06:00–11:59","Radio_m":450,"Cantidad_eventos":9,"Comisaria":"Cria_40","Distrito":"Godoy Cruz","Zona_centroide":"Punta Arenas 834-898","Calles_triangulacion":"Punta Arenas 13 / Salvador Arias 1926 / Pinamar 753 / Los Jacarandá 1808 / Doctor Salvador Civit 1885 / Chuquisaca 376 / Rio Salado / Monte Hermoso 803","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.932085,-68.871144/-32.931163,-68.871828/-32.932591,-68.874698/-32.929368,-68.86909/-32.93368,-68.869329/-32.929145,-68.868551/-32.928841,-68.870447/-32.93158,-68.872283","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.874698 -32.932591, -68.869329 -32.93368, -68.868551 -32.929145, -68.870447 -32.928841, -68.874698 -32.932591))","Centroide_lat":-32.93108266666667,"Centroide_lng":-68.871015,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_02/08/2025_-32.93790_-68.86226_3 // Zona Olaya Pescara de Tomba 1244","Fecha":"2025-08-02T03:00:00.000Z","Día":"Miércoles (33%)","Franja":"🌤️ Mañana (100%)","Rango_horario_total":"06:50–09:40","Rango_operativo_SAT":"06:00–11:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_40","Distrito":"Godoy Cruz","Zona_centroide":"Olaya Pescara de Tomba 1244","Calles_triangulacion":"Tiburcio Benegas 1245 / Olaya Pescara de Tomba 1280","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.938107,-68.861773/-32.93784,-68.862476/-32.93776,-68.862531","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.862531 -32.93776, -68.862476 -32.93784, -68.861773 -32.938107, -68.862531 -32.93776))","Centroide_lat":-32.937902333333334,"Centroide_lng":-68.86225999999999,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_05/08/2025_-32.93111_-68.86260_3 // Zona General Miguel Soler 669","Fecha":"2025-08-05T03:00:00.000Z","Día":"Martes (67%)","Franja":"🌙 Madrugada (67%)","Rango_horario_total":"04:45–16:20","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_40","Distrito":"Godoy Cruz","Zona_centroide":"General Miguel Soler 669","Calles_triangulacion":"Salvador Arias 1428 / Presidente Sarmiento 933 / General Miguel Soler 743","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.928788,-68.861557/-32.931962,-68.864277/-32.932585,-68.861958","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.864277 -32.931962, -68.861958 -32.932585, -68.861557 -32.928788, -68.864277 -32.931962))","Centroide_lat":-32.931111666666666,"Centroide_lng":-68.86259733333334,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_05/08/2025_-32.92672_-68.86971_3 // Zona Illia Arturo Pres. 2588","Fecha":"2025-08-05T03:00:00.000Z","Día":"Lunes (67%)","Franja":"🌙 Madrugada (100%)","Rango_horario_total":"01:50–00:30","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_40","Distrito":"Godoy Cruz","Zona_centroide":"Illia Arturo Pres. 2588","Calles_triangulacion":"Buenaventura Luna / Ceferino Namuncura 12 / Presidente Sarmiento 75","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.927152,-68.869627/-32.925431,-68.866912/-32.927576,-68.872593","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.872593 -32.927576, -68.869627 -32.927152, -68.866912 -32.925431, -68.872593 -32.927576))","Centroide_lat":-32.92671966666667,"Centroide_lng":-68.86971066666666,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_12/08/2025_-32.91612_-68.87187_3 // Zona Cayetano Silva 906","Fecha":"2025-08-12T03:00:00.000Z","Día":"Jueves (33%)","Franja":"☀️ Tarde (33%)","Rango_horario_total":"14:30–00:00","Rango_operativo_SAT":"12:00–17:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_50","Distrito":"Godoy Cruz","Zona_centroide":"Cayetano Silva 906","Calles_triangulacion":"Ascasubi 2638 / Pirovano 763 / Chapanay 2500","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.915099,-68.872666/-32.917705,-68.872298/-32.915558,-68.870634","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.872666 -32.915099, -68.872298 -32.917705, -68.870634 -32.915558, -68.872666 -32.915099))","Centroide_lat":-32.916120666666664,"Centroide_lng":-68.871866,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_05/08/2025_-32.95447_-68.84013_5 // Zona Julio Argentino Roca 2383","Fecha":"2025-08-05T03:00:00.000Z","Día":"Martes (40%)","Franja":"🌆 Noche (40%)","Rango_horario_total":"12:30–15:00","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":5,"Comisaria":"SC_GB","Distrito":"Godoy Cruz","Zona_centroide":"Julio Argentino Roca 2383","Calles_triangulacion":"Las Calandrias 923 / Julio Argentino Roca 2493 / Tortugas 1249 / Rawson 992 / Alem 2289","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.955697,-68.841569/-32.954182,-68.839643/-32.955494,-68.836795/-32.953582,-68.840027/-32.953396,-68.842615","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.842615 -32.953396, -68.841569 -32.955697, -68.836795 -32.955494, -68.840027 -32.953582, -68.842615 -32.953396))","Centroide_lat":-32.9544702,"Centroide_lng":-68.8401298,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_26/07/2025_-32.88420_-68.90073_3 // Zona Vía Sin Nombre","Fecha":"2025-07-26T03:00:00.000Z","Día":"Jueves (33%)","Franja":"🌤️ Mañana (67%)","Rango_horario_total":"10:20–15:00","Rango_operativo_SAT":"06:00–11:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_59","Distrito":"Capital","Zona_centroide":"Vía Sin Nombre","Calles_triangulacion":"Vía Sin Nombre / Los Retamos / Vía Sin Nombre","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.883325,-68.899984/-32.886504,-68.902348/-32.882782,-68.899845","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.902348 -32.886504, -68.899984 -32.883325, -68.899845 -32.882782, -68.902348 -32.886504))","Centroide_lat":-32.88420366666667,"Centroide_lng":-68.90072566666667,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_12/08/2025_-32.89035_-68.90112_3 // Zona Papagallos 11","Fecha":"2025-08-12T03:00:00.000Z","Día":"Martes (67%)","Franja":"🌙 Madrugada (100%)","Rango_horario_total":"00:30–03:30","Rango_operativo_SAT":"00:00–05:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"Cria_59","Distrito":"Capital","Zona_centroide":"Papagallos 11","Calles_triangulacion":"Aguaribay 14 / Isidro Rosales / Las Verbenas","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.890813,-68.902256/-32.892452,-68.899832/-32.887784,-68.901259","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.902256 -32.890813, -68.899832 -32.892452, -68.901259 -32.887784, -68.902256 -32.890813))","Centroide_lat":-32.89034966666667,"Centroide_lng":-68.90111566666667,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_09/08/2025_-32.89413_-68.84242_8 // Zona Avenida Colón 165","Fecha":"2025-08-09T03:00:00.000Z","Día":"Miércoles (38%)","Franja":"🌆 Noche (38%)","Rango_horario_total":"18:50–09:15","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":8,"Comisaria":"EPOA 1","Distrito":"Capital","Zona_centroide":"Avenida Colón 165","Calles_triangulacion":"Montevideo 301-399 / Avenida Colón 137 / L. N. Alem 100 / Avenida Colón 101 / Primitivo de la Reta 923 / Patricias Mendocinas 564 / Patricias Mendocinas 651 / Patricias Mendocinas 605","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.891888,-68.844862/-32.894503,-68.842293/-32.893115,-68.838161/-32.894584,-68.841845/-32.893347,-68.838421/-32.895655,-68.845022/-32.894911,-68.844305/-32.89504,-68.844487","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.845022 -32.895655, -68.841845 -32.894584, -68.838421 -32.893347, -68.838161 -32.893115, -68.844862 -32.891888, -68.845022 -32.895655))","Centroide_lat":-32.894130375,"Centroide_lng":-68.8424245,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_15/08/2025_-32.88967_-68.83778_11 // Zona Catamarca 59","Fecha":"2025-08-15T03:00:00.000Z","Día":"Sábado (18%)","Franja":"🌆 Noche (55%)","Rango_horario_total":"23:20–19:15","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":11,"Comisaria":"EPOA 1","Distrito":"Capital","Zona_centroide":"Catamarca 59","Calles_triangulacion":"San Juan 1037 / San Juan 1166 / Avenida San Martín 1187 / San Juan 1211 / Avenida San Martín 1241 / L. N. Alem 260 / Catamarca 40 / Lavalle 1","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.89164,-68.836993/-32.890299,-68.837128/-32.889725,-68.838953/-32.889587,-68.837009/-32.889089999999996,-68.838913/-32.89264,-68.836297/-32.889452,-68.838329/-32.888357,-68.838806","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.838953 -32.889725, -68.836297 -32.89264, -68.836873 -32.88849, -68.838533 -32.888233, -68.838806 -32.888357, -68.838913 -32.889089999999996, -68.838953 -32.889725))","Centroide_lat":-32.889668454545465,"Centroide_lng":-68.83778245454545,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_18/08/2025_-32.88628_-68.83290_5 // Zona Entre Ríos 387","Fecha":"2025-08-18T03:00:00.000Z","Día":"Lunes (60%)","Franja":"🌆 Noche (60%)","Rango_horario_total":"19:15–14:55","Rango_operativo_SAT":"18:00–23:59","Radio_m":450,"Cantidad_eventos":5,"Comisaria":"EPOA 1","Distrito":"Capital","Zona_centroide":"Entre Ríos 387","Calles_triangulacion":"José Federico Moreno 1539 / San Juan 1499 / Buenos Aires 536 / Buenos Aires 258 / San Luis 599","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.885674,-68.832447/-32.886023,-68.83673/-32.887474,-68.830761/-32.88743,-68.834674/-32.884821,-68.829872","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.83673 -32.886023, -68.834674 -32.88743, -68.830761 -32.887474, -68.829872 -32.884821, -68.83673 -32.886023))","Centroide_lat":-32.8862844,"Centroide_lng":-68.8328968,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_13/08/2025_-32.88697_-68.84076_7 // Zona Necochea 183","Fecha":"2025-08-13T03:00:00.000Z","Día":"Miércoles (43%)","Franja":"☀️ Tarde (71%)","Rango_horario_total":"17:40–17:20","Rango_operativo_SAT":"12:00–17:59","Radio_m":450,"Cantidad_eventos":7,"Comisaria":"EPOA 1","Distrito":"Capital","Zona_centroide":"Necochea 183","Calles_triangulacion":"General Espejo 151 / Necochea 150 / Avenida Las Heras 209 / Avenida España 1401 / Necochea 199 / Avenida Las Heras 300 / Buenos Aires 20","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.889167,-68.840844/-32.887092,-68.84065/-32.885646,-68.841049/-32.886994,-68.841237/-32.88677,-68.84109/-32.885734,-68.842364/-32.887421,-68.838093","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Media (patrón moderado / posible dispersión)","Poligono_WKT":"POLYGON((-68.842364 -32.885734, -68.840844 -32.889167, -68.838093 -32.887421, -68.841049 -32.885646, -68.842364 -32.885734))","Centroide_lat":-32.88697485714285,"Centroide_lng":-68.84076100000001,"Eventos_puntos":""},{"Alerta_ID":"ALR_450m_12/08/2025_-32.88346_-68.84099_3 // Zona Avenida Godoy Cruz 254","Fecha":"2025-08-12T03:00:00.000Z","Día":"Martes (67%)","Franja":"☀️ Tarde (67%)","Rango_horario_total":"13:45–12:50","Rango_operativo_SAT":"12:00–17:59","Radio_m":450,"Cantidad_eventos":3,"Comisaria":"EPOA 1","Distrito":"Capital","Zona_centroide":"Avenida Godoy Cruz 254","Calles_triangulacion":"General Paz 237 / Avenida España 1927 / Avenida Las Heras 359","Link_GMaps_URL":"https://www.google.com/maps/dir/-32.884357,-68.840867/-32.880787,-68.839441/-32.885239,-68.84266","Link_Patrullaje_URL":"","Confiabilidad_leyenda":"Baja (disperso o baja frecuencia)","Poligono_WKT":"POLYGON((-68.84266 -32.885239, -68.840867 -32.884357, -68.839441 -32.880787, -68.84266 -32.885239))","Centroide_lat":-32.883461,"Centroide_lng":-68.84098933333333,"Eventos_puntos":""}];
+  SAT.DELITOS = [{"lat":-32.869285,"lng":-68.843255,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-07-29T02:50:00.000Z"},{"lat":-32.875326,"lng":-68.835127,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-07-29T23:45:00.000Z"},{"lat":-32.868992,"lng":-68.826454,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__4","fecha":"2025-07-30T01:30:00.000Z"},{"lat":-32.874051,"lng":-68.829278,"delito":"Av. Hurto","jurisdiccion":"Cria__4","fecha":"2025-07-31T00:50:00.000Z"},{"lat":-32.864593,"lng":-68.838529,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-07-31T08:00:00.000Z"},{"lat":-32.869494,"lng":-68.822922,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__4","fecha":"2025-08-04T10:25:00.000Z"},{"lat":-32.864360000000005,"lng":-68.836013,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-06T00:45:00.000Z"},{"lat":-32.864873,"lng":-68.835419,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__4","fecha":"2025-08-06T10:30:00.000Z"},{"lat":-32.87152,"lng":-68.83498,"delito":"Av. Robo agravado EGT","jurisdiccion":"Cria__4","fecha":"2025-08-07T23:35:00.000Z"},{"lat":-32.876508,"lng":-68.832185,"delito":"Av. Robo agravado EGT","jurisdiccion":"Cria__4","fecha":"2025-08-08T00:00:00.000Z"},{"lat":-32.875105,"lng":-68.83356,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__4","fecha":"2025-08-09T00:20:00.000Z"},{"lat":-32.866781,"lng":-68.834593,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__4","fecha":"2025-08-09T00:20:00.000Z"},{"lat":-32.875765,"lng":-68.826508,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-09T03:30:00.000Z"},{"lat":-32.870485,"lng":-68.843048,"delito":"Av. Hurto","jurisdiccion":"Cria__4","fecha":"2025-08-11T10:45:00.000Z"},{"lat":-32.871304,"lng":-68.835361,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-13T04:00:00.000Z"},{"lat":-32.876655,"lng":-68.831932,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-13T14:30:00.000Z"},{"lat":-32.870063,"lng":-68.839984,"delito":"Av. Hurto","jurisdiccion":"Cria__4","fecha":"2025-08-14T09:20:00.000Z"},{"lat":-32.878475,"lng":-68.849499,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-15T08:30:00.000Z"},{"lat":-32.873126,"lng":-68.838528,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-18T19:00:00.000Z"},{"lat":-32.873117,"lng":-68.830109,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__4","fecha":"2025-08-19T17:00:00.000Z"},{"lat":-32.881084,"lng":-68.832409,"delito":"Av. Hurto","jurisdiccion":"Cria__4","fecha":"2025-08-21T14:00:00.000Z"},{"lat":-32.862147,"lng":-68.83272,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__4","fecha":"2025-08-22T01:50:00.000Z"},{"lat":-32.867432,"lng":-68.821613,"delito":"Av. Hurto","jurisdiccion":"Cria__4","fecha":"2025-08-22T11:05:00.000Z"},{"lat":-32.875572,"lng":-68.848775,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-23T17:50:00.000Z"},{"lat":-32.872224,"lng":-68.830453,"delito":"Av. Hurto","jurisdiccion":"Cria__4","fecha":"2025-08-23T21:50:00.000Z"},{"lat":-32.867755,"lng":-68.823296,"delito":"Av. Robo","jurisdiccion":"Cria__4","fecha":"2025-08-23T22:15:00.000Z"},{"lat":-32.877258,"lng":-68.835292,"delito":"Av. Hurto","jurisdiccion":"Cria__4","fecha":"2025-08-24T08:30:00.000Z"},{"lat":-32.86606,"lng":-68.84767,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__5","fecha":"2025-07-23T05:00:00.000Z"},{"lat":-32.874733,"lng":-68.873067,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__5","fecha":"2025-07-23T12:00:00.000Z"},{"lat":-32.867591,"lng":-68.845881,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__5","fecha":"2025-07-24T01:20:00.000Z"},{"lat":-32.882923,"lng":-68.861126,"delito":"Av. Hurto","jurisdiccion":"Cria__5","fecha":"2025-07-24T03:20:00.000Z"},{"lat":-32.89262,"lng":-68.85393,"delito":"Av. Hurto","jurisdiccion":"Cria__5","fecha":"2025-07-28T21:00:00.000Z"},{"lat":-32.890547,"lng":-68.857363,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__5","fecha":"2025-07-29T20:40:00.000Z"},{"lat":-32.889295,"lng":-68.859896,"delito":"Av. Robo","jurisdiccion":"Cria__5","fecha":"2025-07-30T22:30:00.000Z"},{"lat":-32.890328,"lng":-68.853143,"delito":"Av. Robo","jurisdiccion":"Cria__5","fecha":"2025-07-31T01:10:00.000Z"},{"lat":-32.897892,"lng":-68.854079,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__5","fecha":"2025-08-01T20:05:00.000Z"},{"lat":-32.89796,"lng":-68.860875,"delito":"Av. Robo","jurisdiccion":"Cria__5","fecha":"2025-08-02T01:50:00.000Z"},{"lat":-32.891267,"lng":-68.859129,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__5","fecha":"2025-08-02T02:40:00.000Z"},{"lat":-32.885182,"lng":-68.849963,"delito":"Av. Robo","jurisdiccion":"Cria__5","fecha":"2025-08-05T04:10:00.000Z"},{"lat":-32.901758,"lng":-68.857156,"delito":"Av. Robo","jurisdiccion":"Cria__5","fecha":"2025-08-06T08:20:00.000Z"},{"lat":-32.885144,"lng":-68.853509,"delito":"Av. Hurto","jurisdiccion":"Cria__5","fecha":"2025-08-07T01:00:00.000Z"},{"lat":-32.89155,"lng":-68.856411,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__5","fecha":"2025-08-07T02:50:00.000Z"},{"lat":-32.895904,"lng":-68.857463,"delito":"Av. Robo","jurisdiccion":"Cria__5","fecha":"2025-08-07T03:10:00.000Z"},{"lat":-32.899495,"lng":-68.862605,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__5","fecha":"2025-08-07T11:30:00.000Z"},{"lat":-32.896124,"lng":-68.862897,"delito":"Av. Hurto","jurisdiccion":"Cria__5","fecha":"2025-08-07T21:30:00.000Z"},{"lat":-32.889511,"lng":-68.853574,"delito":"Av. Robo","jurisdiccion":"Cria__5","fecha":"2025-08-13T01:22:00.000Z"},{"lat":-32.895152,"lng":-68.857072,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__5","fecha":"2025-08-13T18:20:00.000Z"},{"lat":-32.891023,"lng":-68.854534,"delito":"Av. Hurto","jurisdiccion":"Cria__5","fecha":"2025-08-16T19:00:00.000Z"},{"lat":-32.893431,"lng":-68.854997,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__5","fecha":"2025-08-20T04:20:00.000Z"},{"lat":-32.869173,"lng":-68.863657,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__5","fecha":"2025-08-22T00:45:00.000Z"},{"lat":-32.895769,"lng":-68.863355,"delito":"Av. Hurto","jurisdiccion":"Cria__5","fecha":"2025-08-22T21:00:00.000Z"},{"lat":-32.877482,"lng":-68.871934,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__6","fecha":"2025-07-24T00:30:00.000Z"},{"lat":-32.873178,"lng":-68.870571,"delito":"Av. Robo Agravado por escalamiento","jurisdiccion":"Cria__6","fecha":"2025-08-04T23:00:00.000Z"},{"lat":-32.867726,"lng":-68.848157,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__6","fecha":"2025-08-08T01:10:00.000Z"},{"lat":-32.864907,"lng":-68.855889,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__6","fecha":"2025-08-17T02:30:00.000Z"},{"lat":-32.942775,"lng":-68.848214,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-07-23T02:20:00.000Z"},{"lat":-32.940265,"lng":-68.850782,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-07-23T04:40:00.000Z"},{"lat":-32.936566,"lng":-68.847003,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-07-23T06:30:00.000Z"},{"lat":-32.9287,"lng":-68.844854,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__7","fecha":"2025-07-23T23:30:00.000Z"},{"lat":-32.942574,"lng":-68.848233,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__7","fecha":"2025-07-25T05:45:00.000Z"},{"lat":-32.93473,"lng":-68.850249,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__7","fecha":"2025-07-27T05:45:00.000Z"},{"lat":-32.935088,"lng":-68.84815,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__7","fecha":"2025-07-27T07:15:00.000Z"},{"lat":-32.939106,"lng":-68.850469,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__7","fecha":"2025-07-29T07:10:00.000Z"},{"lat":-32.924325,"lng":-68.858916,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria__7","fecha":"2025-08-01T22:45:00.000Z"},{"lat":-32.92712,"lng":-68.84081,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__7","fecha":"2025-08-05T07:00:00.000Z"},{"lat":-32.943314,"lng":-68.855738,"delito":"Av. Hurto","jurisdiccion":"Cria__7","fecha":"2025-08-09T03:00:00.000Z"},{"lat":-32.947859,"lng":-68.854526,"delito":"Av. Robo Agravado por escalamiento","jurisdiccion":"Cria__7","fecha":"2025-08-09T08:00:00.000Z"},{"lat":-32.935041,"lng":-68.852121,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-08-09T11:45:00.000Z"},{"lat":-32.934593,"lng":-68.848268,"delito":"Av. Hurto","jurisdiccion":"Cria__7","fecha":"2025-08-09T20:40:00.000Z"},{"lat":-32.942269,"lng":-68.848462,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-08-13T07:00:00.000Z"},{"lat":-32.934769,"lng":-68.845057,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-08-15T04:10:00.000Z"},{"lat":-32.942172,"lng":-68.854343,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__7","fecha":"2025-08-16T04:30:00.000Z"},{"lat":-32.931428,"lng":-68.24813,"delito":"Av. Robo Agravado","jurisdiccion":"Cria__7","fecha":"2025-08-18T00:20:00.000Z"},{"lat":-32.933924,"lng":-68.847403,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-08-19T00:30:00.000Z"},{"lat":-32.93769,"lng":-68.853169,"delito":"Av. Robo Agravado por ser en Poblado y en Banda","jurisdiccion":"Cria__7","fecha":"2025-08-19T04:20:00.000Z"},{"lat":-32.945116,"lng":-68.856351,"delito":"Av. Robo","jurisdiccion":"Cria__7","fecha":"2025-08-19T08:10:00.000Z"},{"lat":-32.937249,"lng":-68.853137,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria__7","fecha":"2025-08-19T20:30:00.000Z"},{"lat":-32.925212,"lng":-68.84511,"delito":"Av. Hurto","jurisdiccion":"Cria__7","fecha":"2025-08-20T03:30:00.000Z"},{"lat":-32.917712,"lng":-68.861321,"delito":"Av. Hurto","jurisdiccion":"Cria_27","fecha":"2025-07-25T01:30:00.000Z"},{"lat":-32.905038,"lng":-68.872942,"delito":"Av. Robo","jurisdiccion":"Cria_27","fecha":"2025-07-30T13:00:00.000Z"},{"lat":-32.902586,"lng":-68.864298,"delito":"Av. Robo EGT","jurisdiccion":"Cria_27","fecha":"2025-08-02T03:30:00.000Z"},{"lat":-32.901686,"lng":-68.868331,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_27","fecha":"2025-08-04T00:50:00.000Z"},{"lat":-32.906956,"lng":-68.865937,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_27","fecha":"2025-08-05T23:20:00.000Z"},{"lat":-32.919452,"lng":-68.861536,"delito":"Av. Robo Agravado por escalamiento","jurisdiccion":"Cria_27","fecha":"2025-08-06T01:00:00.000Z"},{"lat":-32.905724,"lng":-68.862133,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_27","fecha":"2025-08-07T02:05:00.000Z"},{"lat":-32.906422,"lng":-68.872566,"delito":"Av. Robo","jurisdiccion":"Cria_27","fecha":"2025-08-07T21:50:00.000Z"},{"lat":-32.903689,"lng":-68.863112,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_27","fecha":"2025-08-13T14:18:00.000Z"},{"lat":-32.912381,"lng":-68.859959,"delito":"Av. Robo","jurisdiccion":"Cria_27","fecha":"2025-08-13T23:00:00.000Z"},{"lat":-32.908617,"lng":-68.862561,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_27","fecha":"2025-08-16T07:00:00.000Z"},{"lat":-32.905141,"lng":-68.86888,"delito":"Av. Robo","jurisdiccion":"Cria_27","fecha":"2025-08-22T21:30:00.000Z"},{"lat":-32.90666,"lng":-68.860585,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_27","fecha":"2025-08-22T23:40:00.000Z"},{"lat":-32.905728,"lng":-68.863813,"delito":"Av. Robo","jurisdiccion":"Cria_27","fecha":"2025-08-23T11:00:00.000Z"},{"lat":-32.905128,"lng":-68.86875,"delito":"Av. Robo Agravado por ser en Poblado y en Banda","jurisdiccion":"Cria_27","fecha":"2025-08-23T16:35:00.000Z"},{"lat":-32.862235,"lng":-68.875905,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_33","fecha":"2025-07-24T02:00:00.000Z"},{"lat":-32.86959,"lng":-68.864347,"delito":"Av. Robo","jurisdiccion":"Cria_33","fecha":"2025-07-25T21:30:00.000Z"},{"lat":-32.863221,"lng":-68.861426,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_33","fecha":"2025-07-27T08:05:00.000Z"},{"lat":-32.860788,"lng":-68.864744,"delito":"Av. Robo","jurisdiccion":"Cria_33","fecha":"2025-07-28T13:30:00.000Z"},{"lat":-32.918491,"lng":-68.849428,"delito":"Av. Robo","jurisdiccion":"Cria_33","fecha":"2025-08-01T03:30:00.000Z"},{"lat":-32.862282,"lng":-68.864161,"delito":"Av. Robo","jurisdiccion":"Cria_33","fecha":"2025-08-09T12:35:00.000Z"},{"lat":-32.868045,"lng":-68.946419,"delito":"Av. Hurto","jurisdiccion":"Cria_33","fecha":"2025-08-12T22:00:00.000Z"},{"lat":-32.870952,"lng":-68.881933,"delito":"Av. Hurto","jurisdiccion":"Cria_33","fecha":"2025-08-19T16:20:00.000Z"},{"lat":-32.908137,"lng":-68.850512,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-07-23T21:20:00.000Z"},{"lat":-32.914389,"lng":-68.859313,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-07-26T06:00:00.000Z"},{"lat":-32.908304,"lng":-68.853998,"delito":"Av. Hurto","jurisdiccion":"Cria_34","fecha":"2025-07-28T23:30:00.000Z"},{"lat":-32.913054,"lng":-68.859608,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_34","fecha":"2025-07-29T00:00:00.000Z"},{"lat":-32.906953,"lng":-68.85144,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_34","fecha":"2025-07-31T11:30:00.000Z"},{"lat":-32.907585,"lng":-68.844108,"delito":"Av. Robo EGT","jurisdiccion":"Cria_34","fecha":"2025-07-31T19:00:00.000Z"},{"lat":-32.915481,"lng":-68.846055,"delito":"Av. Robo Agravado por escalamiento","jurisdiccion":"Cria_34","fecha":"2025-08-01T11:00:00.000Z"},{"lat":-32.915581,"lng":-68.854387,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_34","fecha":"2025-08-01T23:15:00.000Z"},{"lat":-32.909843,"lng":-68.849215,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-08-02T05:50:00.000Z"},{"lat":-32.91597,"lng":-68.859462,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-08-06T15:35:00.000Z"},{"lat":-32.908232,"lng":-68.848085,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_34","fecha":"2025-08-07T02:30:00.000Z"},{"lat":-32.905006,"lng":-68.846081,"delito":"Av. Hurto","jurisdiccion":"Cria_34","fecha":"2025-08-08T03:00:00.000Z"},{"lat":-32.909093,"lng":-68.84255999999999,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_34","fecha":"2025-08-08T16:00:00.000Z"},{"lat":-32.916721,"lng":-68.849475,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_34","fecha":"2025-08-10T00:50:00.000Z"},{"lat":-32.908175,"lng":-68.855279,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-08-11T05:10:00.000Z"},{"lat":-32.910873,"lng":-68.848275,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-08-12T05:30:00.000Z"},{"lat":-32.913949,"lng":-68.840468,"delito":"Av. Hurto","jurisdiccion":"Cria_34","fecha":"2025-08-12T14:35:00.000Z"},{"lat":-32.909184,"lng":-68.849207,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-08-17T04:00:00.000Z"},{"lat":-32.920879,"lng":-68.85013,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-08-21T14:30:00.000Z"},{"lat":-32.902521,"lng":-68.853472,"delito":"Av. Hurto EGT","jurisdiccion":"Cria_34","fecha":"2025-08-21T20:45:00.000Z"},{"lat":-32.920352,"lng":-68.844512,"delito":"Av. Robo","jurisdiccion":"Cria_34","fecha":"2025-08-22T07:00:00.000Z"},{"lat":-32.948486,"lng":-68.820146,"delito":"Av. Hurto","jurisdiccion":"Cria_37","fecha":"2025-07-27T22:00:00.000Z"},{"lat":-32.942862,"lng":-68.82045,"delito":"Av. Robo","jurisdiccion":"Cria_37","fecha":"2025-08-02T16:45:00.000Z"},{"lat":-32.935901,"lng":-68.840359,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_37","fecha":"2025-08-07T02:00:00.000Z"},{"lat":-32.934337,"lng":-68.839797,"delito":"Av. Robo","jurisdiccion":"Cria_37","fecha":"2025-08-08T10:00:00.000Z"},{"lat":-32.94633,"lng":-68.820063,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_37","fecha":"2025-08-11T20:00:00.000Z"},{"lat":-32.889866,"lng":-68.799374,"delito":"Av. Robo","jurisdiccion":"Cria_37","fecha":"2025-08-13T13:00:00.000Z"},{"lat":-32.944088,"lng":-68.819668,"delito":"Av. Robo","jurisdiccion":"Cria_37","fecha":"2025-08-13T23:00:00.000Z"},{"lat":-32.949134,"lng":-68.823532,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_37","fecha":"2025-08-18T11:00:00.000Z"},{"lat":-32.934363,"lng":-68.833937,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_37","fecha":"2025-08-20T01:20:00.000Z"},{"lat":-32.948931,"lng":-68.82053,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_37","fecha":"2025-08-20T23:55:00.000Z"},{"lat":-32.945123,"lng":-68.832302,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_37","fecha":"2025-08-23T11:05:00.000Z"},{"lat":-32.932085,"lng":-68.871144,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_40","fecha":"2025-07-23T09:45:00.000Z"},{"lat":-32.938107,"lng":-68.861773,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_40","fecha":"2025-07-23T09:50:00.000Z"},{"lat":-32.95035,"lng":-68.857242,"delito":"Av. Hurto","jurisdiccion":"Cria_40","fecha":"2025-07-23T19:40:00.000Z"},{"lat":-32.931163,"lng":-68.871828,"delito":"Av. Robo Agravado por el uso de arma de Blanca","jurisdiccion":"Cria_40","fecha":"2025-07-26T17:45:00.000Z"},{"lat":-32.928788,"lng":-68.861557,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-07-27T07:45:00.000Z"},{"lat":-32.932591,"lng":-68.874698,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_40","fecha":"2025-07-28T01:00:00.000Z"},{"lat":-32.947253,"lng":-68.857893,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-07-28T13:00:00.000Z"},{"lat":-32.929368,"lng":-68.86909,"delito":"Av. Hurto","jurisdiccion":"Cria_40","fecha":"2025-08-01T12:00:00.000Z"},{"lat":-32.93784,"lng":-68.862476,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-02T13:40:00.000Z"},{"lat":-32.93368,"lng":-68.869329,"delito":"Av. Hurto","jurisdiccion":"Cria_40","fecha":"2025-08-03T01:50:00.000Z"},{"lat":-32.940398,"lng":-68.858105,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_40","fecha":"2025-08-03T20:00:00.000Z"},{"lat":-32.927152,"lng":-68.869627,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-04T04:50:00.000Z"},{"lat":-32.93776,"lng":-68.862531,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-04T12:40:00.000Z"},{"lat":-32.925431,"lng":-68.866912,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-05T03:00:00.000Z"},{"lat":-32.945,"lng":-68.859172,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-05T05:38:00.000Z"},{"lat":-32.931962,"lng":-68.864277,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_40","fecha":"2025-08-05T06:38:00.000Z"},{"lat":-32.929145,"lng":-68.868551,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-07T00:15:00.000Z"},{"lat":-32.950192,"lng":-68.874801,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-07T18:30:00.000Z"},{"lat":-32.947476,"lng":-68.861559,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-10T22:15:00.000Z"},{"lat":-32.940426,"lng":-68.876226,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_40","fecha":"2025-08-10T23:15:00.000Z"},{"lat":-32.88811,"lng":-68.852627,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-11T23:20:00.000Z"},{"lat":-32.932585,"lng":-68.861958,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-12T19:20:00.000Z"},{"lat":-32.948989,"lng":-68.861557,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_40","fecha":"2025-08-15T02:40:00.000Z"},{"lat":-32.942451,"lng":-68.862184,"delito":"Av. Hurto","jurisdiccion":"Cria_40","fecha":"2025-08-17T15:40:00.000Z"},{"lat":-32.928841,"lng":-68.870447,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_40","fecha":"2025-08-19T06:30:00.000Z"},{"lat":-32.93158,"lng":-68.872283,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_40","fecha":"2025-08-23T10:00:00.000Z"},{"lat":-32.931291,"lng":-68.871765,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_40","fecha":"2025-08-23T10:20:00.000Z"},{"lat":-32.941061,"lng":-68.871379,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-08-23T13:30:00.000Z"},{"lat":-32.927576,"lng":-68.872593,"delito":"Av. Hurto","jurisdiccion":"Cria_40","fecha":"2025-08-25T03:30:00.000Z"},{"lat":-32.940078,"lng":-68.867937,"delito":"Av. Robo","jurisdiccion":"Cria_40","fecha":"2025-09-02T13:15:00.000Z"},{"lat":-32.924884,"lng":-68.87447,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_50","fecha":"2025-07-24T13:30:00.000Z"},{"lat":-32.911378,"lng":-68.883474,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_50","fecha":"2025-08-02T09:00:00.000Z"},{"lat":-32.911042,"lng":-68.873957,"delito":"Av. Robo","jurisdiccion":"Cria_50","fecha":"2025-08-02T09:00:00.000Z"},{"lat":-32.903135,"lng":-68.873833,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_50","fecha":"2025-08-03T10:50:00.000Z"},{"lat":-32.915099,"lng":-68.872666,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_50","fecha":"2025-08-07T17:30:00.000Z"},{"lat":-32.901389,"lng":-68.882668,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_50","fecha":"2025-08-08T00:40:00.000Z"},{"lat":-32.914123,"lng":-68.875951,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_50","fecha":"2025-08-10T15:20:00.000Z"},{"lat":-32.917705,"lng":-68.872298,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_50","fecha":"2025-08-12T10:50:00.000Z"},{"lat":-32.915558,"lng":-68.870634,"delito":"Av. Robo","jurisdiccion":"Cria_50","fecha":"2025-08-15T03:00:00.000Z"},{"lat":-32.930378,"lng":-68.888548,"delito":"Av. Hurto","jurisdiccion":"Cria_50","fecha":"2025-08-17T10:50:00.000Z"},{"lat":-32.90869,"lng":-68.880083,"delito":"Av. Robo","jurisdiccion":"Cria_50","fecha":"2025-08-19T15:30:00.000Z"},{"lat":-32.173649,"lng":-68.264949,"delito":"Av. Robo Agravado","jurisdiccion":"Cria_52","fecha":"2025-07-27T01:00:00.000Z"},{"lat":-32.954182,"lng":-68.839643,"delito":"Av. Robo","jurisdiccion":"Cria_52","fecha":"2025-07-29T21:30:00.000Z"},{"lat":-32.028528,"lng":-68.173429,"delito":"Av. Robo","jurisdiccion":"Cria_52","fecha":"2025-07-29T21:50:00.000Z"},{"lat":-32.927398,"lng":-68.174016,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_52","fecha":"2025-07-30T09:30:00.000Z"},{"lat":-32.955494,"lng":-68.836795,"delito":"Av. Robo","jurisdiccion":"Cria_52","fecha":"2025-08-05T23:30:00.000Z"},{"lat":-32.954056,"lng":-68.831654,"delito":"Av. Robo","jurisdiccion":"Cria_52","fecha":"2025-08-09T01:00:00.000Z"},{"lat":-32.954748,"lng":-68.833986,"delito":"Av. Robo","jurisdiccion":"Cria_52","fecha":"2025-08-20T11:20:00.000Z"},{"lat":-32.883325,"lng":-68.899984,"delito":"Av. Robo","jurisdiccion":"Cria_59","fecha":"2025-07-24T13:20:00.000Z"},{"lat":-32.886504,"lng":-68.902348,"delito":"Av. Robo","jurisdiccion":"Cria_59","fecha":"2025-07-26T14:45:00.000Z"},{"lat":-32.893827,"lng":-68.916647,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"Cria_59","fecha":"2025-07-27T11:10:00.000Z"},{"lat":-32.890813,"lng":-68.902256,"delito":"Av. Hurto Agravado","jurisdiccion":"Cria_59","fecha":"2025-07-29T03:30:00.000Z"},{"lat":-32.891668,"lng":-68.91318,"delito":"Av. Robo","jurisdiccion":"Cria_59","fecha":"2025-08-08T08:00:00.000Z"},{"lat":-32.882782,"lng":-68.899845,"delito":"Av. Hurto","jurisdiccion":"Cria_59","fecha":"2025-08-08T18:00:00.000Z"},{"lat":-32.884971,"lng":-68.892548,"delito":"Av. Robo","jurisdiccion":"Cria_59","fecha":"2025-08-09T18:30:00.000Z"},{"lat":-32.892452,"lng":-68.899832,"delito":"Av. Hurto EGT","jurisdiccion":"Cria_59","fecha":"2025-08-12T05:30:00.000Z"},{"lat":-32.886952,"lng":-68.905993,"delito":"Av. Robo","jurisdiccion":"Cria_59","fecha":"2025-08-14T18:50:00.000Z"},{"lat":-32.892981,"lng":-68.909617,"delito":"Av. Hurto","jurisdiccion":"Cria_59","fecha":"2025-08-21T04:30:00.000Z"},{"lat":-32.886948,"lng":-68.894307,"delito":"Av. Robo","jurisdiccion":"Cria_59","fecha":"2025-08-22T03:00:00.000Z"},{"lat":-32.887784,"lng":-68.901259,"delito":"Av. Robo Agravado por el uso de arma de Blanca","jurisdiccion":"Cria_59","fecha":"2025-08-24T06:30:00.000Z"},{"lat":-32.881099,"lng":-68.844811,"delito":"Av. Hurto Agravado","jurisdiccion":"EPOA 1","fecha":"2025-07-23T11:30:00.000Z"},{"lat":-32.883944,"lng":-68.845322,"delito":"Av. Hurto Agravado","jurisdiccion":"EPOA 1","fecha":"2025-07-26T23:30:00.000Z"},{"lat":-32.89741,"lng":-68.855695,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-07-27T01:30:00.000Z"},{"lat":-32.894503,"lng":-68.842293,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-07-29T18:00:00.000Z"},{"lat":-32.874305,"lng":-68.842423,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-07-31T00:45:00.000Z"},{"lat":-32.878716,"lng":-68.835925,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-02T18:50:00.000Z"},{"lat":-32.89164,"lng":-68.836993,"delito":"Av. Hurto Agravado","jurisdiccion":"EPOA 1","fecha":"2025-08-04T02:20:00.000Z"},{"lat":-32.885674,"lng":-68.832447,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-05T22:15:00.000Z"},{"lat":-32.889725,"lng":-68.838953,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-05T22:25:00.000Z"},{"lat":-32.893465,"lng":-68.847746,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-06T12:10:00.000Z"},{"lat":-32.879821,"lng":-68.835636,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-06T17:30:00.000Z"},{"lat":-32.884215,"lng":-68.829826,"delito":"Av. Hurto Agravado","jurisdiccion":"EPOA 1","fecha":"2025-08-06T20:00:00.000Z"},{"lat":-32.889167,"lng":-68.840844,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-06T20:40:00.000Z"},{"lat":-32.893115,"lng":-68.838161,"delito":"Av. Hurto Agravado","jurisdiccion":"EPOA 1","fecha":"2025-08-08T02:40:00.000Z"},{"lat":-32.894584,"lng":-68.841845,"delito":"Av. Hurto Agravado","jurisdiccion":"EPOA 1","fecha":"2025-08-08T14:58:00.000Z"},{"lat":-32.884357,"lng":-68.840867,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-08T16:45:00.000Z"},{"lat":-32.874305,"lng":-68.842455,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-08T18:30:00.000Z"},{"lat":-32.885646,"lng":-68.841049,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-08T19:40:00.000Z"},{"lat":-32.889587,"lng":-68.837009,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-09T22:20:00.000Z"},{"lat":-32.896865,"lng":-68.85811000000001,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-09T22:40:00.000Z"},{"lat":-32.893347,"lng":-68.838421,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-10T02:15:00.000Z"},{"lat":-32.886023,"lng":-68.83673,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-12T00:00:00.000Z"},{"lat":-32.880787,"lng":-68.839441,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-12T13:20:00.000Z"},{"lat":-32.885239,"lng":-68.84266,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-12T15:50:00.000Z"},{"lat":-32.88677,"lng":-68.84109,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-13T23:20:00.000Z"},{"lat":-32.882899,"lng":-68.83353,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-15T22:30:00.000Z"},{"lat":-32.89264,"lng":-68.836297,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-15T23:15:00.000Z"},{"lat":-32.889452,"lng":-68.838329,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-16T00:30:00.000Z"},{"lat":-32.883653,"lng":-68.832315,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-16T01:30:00.000Z"},{"lat":-32.888357,"lng":-68.838806,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-16T16:00:00.000Z"},{"lat":-32.872752,"lng":-68.841552,"delito":"Av. Robo Agravado por el uso de arma de Blanca","jurisdiccion":"EPOA 1","fecha":"2025-08-18T00:00:00.000Z"},{"lat":-32.895655,"lng":-68.845022,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-18T08:30:00.000Z"},{"lat":-32.888233,"lng":-68.838533,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-18T11:50:00.000Z"},{"lat":-32.885734,"lng":-68.842364,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-18T17:00:00.000Z"},{"lat":-32.887474,"lng":-68.830761,"delito":"Av. Hurto Agravado","jurisdiccion":"EPOA 1","fecha":"2025-08-18T18:45:00.000Z"},{"lat":-32.88743,"lng":-68.834674,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-18T22:20:00.000Z"},{"lat":-32.88849,"lng":-68.836873,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-20T07:00:00.000Z"},{"lat":-32.894911,"lng":-68.844305,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-20T12:15:00.000Z"},{"lat":-32.89504,"lng":-68.844487,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-20T12:15:00.000Z"},{"lat":-32.884821,"lng":-68.829872,"delito":"Av. Robo","jurisdiccion":"EPOA 1","fecha":"2025-08-20T17:55:00.000Z"},{"lat":-32.88884,"lng":-68.837773,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-21T22:15:00.000Z"},{"lat":-32.893633,"lng":-68.834585,"delito":"Av. Hurto EGT","jurisdiccion":"EPOA 1","fecha":"2025-08-22T11:50:00.000Z"},{"lat":-32.887421,"lng":-68.838093,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-22T20:20:00.000Z"},{"lat":-32.878445,"lng":-68.836185,"delito":"Av. Hurto","jurisdiccion":"EPOA 1","fecha":"2025-08-24T12:00:00.000Z"},{"lat":-32.946136,"lng":-68.840096,"delito":"Av. Hurto","jurisdiccion":"SC_GB","fecha":"2025-07-22T23:30:00.000Z"},{"lat":-32.955697,"lng":-68.841569,"delito":"Av. Robo","jurisdiccion":"SC_GB","fecha":"2025-07-23T15:30:00.000Z"},{"lat":-32.956736,"lng":-68.847479,"delito":"Av. Robo","jurisdiccion":"SC_GB","fecha":"2025-07-25T08:35:00.000Z"},{"lat":-32.957456,"lng":-68.842879,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"SC_GB","fecha":"2025-08-04T06:30:00.000Z"},{"lat":-32.953582,"lng":-68.840027,"delito":"Av. Robo","jurisdiccion":"SC_GB","fecha":"2025-08-08T05:20:00.000Z"},{"lat":-32.950426,"lng":-68.845341,"delito":"Av. Robo Agravado por el uso de arma de Blanca","jurisdiccion":"SC_GB","fecha":"2025-08-18T11:30:00.000Z"},{"lat":-32.941205,"lng":-68.841391,"delito":"Av. Robo","jurisdiccion":"SC_GB","fecha":"2025-08-20T16:00:00.000Z"},{"lat":-32.947815,"lng":-68.841123,"delito":"Av. Robo","jurisdiccion":"SC_GB","fecha":"2025-08-21T10:45:00.000Z"},{"lat":-32.953396,"lng":-68.842615,"delito":"Av. Robo","jurisdiccion":"SC_GB","fecha":"2025-08-21T18:00:00.000Z"},{"lat":-32.949431,"lng":-68.73134,"delito":"Av. Robo Agravado por el uso de arma de Fuego","jurisdiccion":"SC_ZIM","fecha":"2025-07-26T22:30:00.000Z"},{"lat":-32.944518,"lng":-68.735038,"delito":"Av. Robo","jurisdiccion":"SC_ZIM","fecha":"2025-08-01T16:55:00.000Z"},{"lat":-32.954382,"lng":-68.731578,"delito":"Av. Robo","jurisdiccion":"SC_ZIM","fecha":"2025-08-08T21:10:00.000Z"},{"lat":-32.937251,"lng":-68.775554,"delito":"Av. Hurto Agravado","jurisdiccion":"SC_ZIM","fecha":"2025-08-09T09:15:00.000Z"},{"lat":-32.95035,"lng":-68.724792,"delito":"Av. Robo","jurisdiccion":"SC_ZIM","fecha":"2025-08-09T23:00:00.000Z"},{"lat":-32.949271,"lng":-68.752943,"delito":"Av. Robo","jurisdiccion":"SC_ZIM","fecha":"2025-08-12T05:40:00.000Z"},{"lat":-32.936248,"lng":-68.779909,"delito":"Av. Robo","jurisdiccion":"SC_ZIM","fecha":"2025-08-12T15:20:00.000Z"},{"lat":-32.932317,"lng":-68.793111,"delito":"Av. Robo","jurisdiccion":"SC_ZIM","fecha":"2025-08-15T17:30:00.000Z"},{"lat":-32.891888,"lng":-68.844862,"delito":"Av. Robo Agravado por ser en Poblado y en Banda","jurisdiccion":"UCAR","fecha":"2025-07-23T21:50:00.000Z"},{"lat":-32.890299,"lng":-68.837128,"delito":"Av. Hurto","jurisdiccion":"UCAR","fecha":"2025-08-04T12:00:00.000Z"},{"lat":-32.887092,"lng":-68.84065,"delito":"Av. Hurto","jurisdiccion":"UCAR","fecha":"2025-08-08T14:30:00.000Z"},{"lat":-32.886994,"lng":-68.841237,"delito":"Av. Hurto EGT","jurisdiccion":"UCAR","fecha":"2025-08-13T15:05:00.000Z"},{"lat":-32.889089999999996,"lng":-68.838913,"delito":"Av. Robo","jurisdiccion":"UCAR","fecha":"2025-08-14T15:10:00.000Z"}];
+  SAT.PERIOD  = {"desdeISO":"2025-07-22","hastaISO":"2025-09-02","desdeLbl":"22/07/2025","hastaLbl":"02/09/2025","eventos":259};
+  if (typeof window.DATA === 'undefined')        window.DATA = SAT.DATA;
+  if (typeof window.DELITOS_DATA === 'undefined')window.DELITOS_DATA = SAT.DELITOS;
+  if (typeof window.PERIOD === 'undefined')      window.PERIOD = SAT.PERIOD;
+
+  // ===== estado UI/Tabla =====
+  let LAST_ROWS = [];
+  let delitosDaysLimit = null;
+  let filteredDelitosDays = Array.isArray(DELITOS_DATA) ? DELITOS_DATA.slice() : [];
+
+  let POINT_RADIUS = 4;
+  let HEAT_RADIUS  = 28;
+
+  function setBtnState(id, active){
+    const el = document.getElementById(id);
+    if (!el) return;
+    var outline = null;
+    var classes = el.classList ? Array.from(el.classList) : [];
+    for (var i=0;i<classes.length;i++){ if (classes[i].indexOf('btn-outline-')===0){ outline = classes[i]; break; } }
+    if (!outline) return;
+    const solid = outline.replace('btn-outline-','btn-');
+    if (active){ el.classList.remove(outline); el.classList.add(solid); }
+    else { el.classList.remove(solid); el.classList.add(outline); }
+  }
+
+  function fmtFecha(iso){
+    if (!iso) return '';
+    try {
+      var d = new Date(iso);
+      return d.toLocaleDateString('es-AR') + ' ' + d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    } catch(e){ return ''; }
+  }
+  function openURL(u){ window.open(u, "_blank"); }
+  function isValidDate(d){ return d && !isNaN(+new Date(d)); }
+
+  // ===== filtros dinámicos =====
+  const fComis   = document.getElementById('fComis');
+  const fDesdeEl = document.getElementById('fDesde');
+  const fHastaEl = document.getElementById('fHasta');
+  const fVentEl  = document.getElementById('fVentana');
+
+  const uniq = (arr) => Array.from(new Set(arr)).filter(function(x){return !!x;}).sort();
+  uniq(DATA.map(function(r){ return r.Distrito; })).forEach(function(v){ fComis.innerHTML += '<option>'+v+'</option>'; });
+
+  if (PERIOD.desdeISO) fDesdeEl.value = PERIOD.desdeISO;
+  if (PERIOD.hastaISO) fHastaEl.value = PERIOD.hastaISO;
+
+  fDesdeEl.addEventListener('change', renderAll);
+  fHastaEl.addEventListener('change', renderAll);
+  fComis.addEventListener('change', renderAll);
+  document.getElementById('fFranja').addEventListener('change', renderAll);
+  document.getElementById('fDia').addEventListener('change', renderAll);
+
+  fVentEl.addEventListener('change', function(){
+    var v = fVentEl.value;
+    delitosDaysLimit = v ? parseInt(v, 10) : null;
+    renderAll();
+  });
+
+  const sPt = document.getElementById('sPt');
+  const sPtVal = document.getElementById('sPtVal');
+  if (sPt) {
+    sPt.addEventListener('input', function(){
+      POINT_RADIUS = parseInt(sPt.value,10) || 4;
+      HEAT_RADIUS  = Math.max(12, Math.round(POINT_RADIUS * 7));
+      if (sPtVal) sPtVal.textContent = POINT_RADIUS;
+
+      if (delitosLayer && map.hasLayer(delitosLayer)) {
+        map.removeLayer(delitosLayer);
+        delitosLayer = makeDelitosLayer(filteredDelitosDays).addTo(map);
+        setBtnState('btnDelitos', true);
+      } else {
+        delitosLayer = makeDelitosLayer(filteredDelitosDays);
+      }
+      if (heatLayer && map.hasLayer(heatLayer)) {
+        map.removeLayer(heatLayer);
+        heatLayer = L.heatLayer(buildHeatDataDelitos(filteredDelitosDays), {radius:HEAT_RADIUS, blur:15, maxZoom:18}).addTo(map);
+        setBtnState('btnHeat', true);
+      }
+    });
+  }
+
+  function dayCanonical(s){
+    var t = String(s||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .replace(/[+%()]/g,' ')
+      .replace(/\d+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+    if (t.indexOf('lun')>-1) return 'lunes';
+    if (t.indexOf('mar')>-1) return 'martes';
+    if (t.indexOf('mie')>-1) return 'miercoles';
+    if (t.indexOf('jue')>-1) return 'jueves';
+    if (t.indexOf('vie')>-1) return 'viernes';
+    if (t.indexOf('sab')>-1) return 'sabado';
+    if (t.indexOf('dom')>-1) return 'domingo';
+    return '';
+  }
+
+  function filterRows() {
+    var dDesde = fDesdeEl.value;
+    var dHasta = fHastaEl.value;
+    var distritoSel  = fComis.value || '';
+    var diaSel = document.getElementById('fDia').value || '';
+    var franja = (document.getElementById('fFranja').value || '');
+
+    var norm = function(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); };
+    var canonical = function(s){
+      var t = norm(s);
+      if (t.indexOf('madrug')>-1) return 'madrugada';
+      if (t.indexOf('manana')>-1 || t.indexOf('mañana')>-1) return 'mañana';
+      if (t.indexOf('tarde')>-1)  return 'tarde';
+      if (t.indexOf('noche')>-1)  return 'noche';
+      return '';
+    };
+
+    return DATA.filter(function(r){
+      if (dDesde) { if (!r.Fecha || new Date(r.Fecha) < new Date(dDesde + 'T00:00:00')) return false; }
+      if (dHasta) { if (!r.Fecha || new Date(r.Fecha) > new Date(dHasta + 'T23:59:59')) return false; }
+      if (distritoSel && r.Distrito !== distritoSel) return false;
+
+      if (franja) {
+        var can = canonical(r.Franja || '');
+        if (!can || canonical(franja) !== can) return false;
+      }
+
+      if (diaSel) {
+        var dRow = dayCanonical(r.Día || r.Dia || '');
+        if (!dRow || dRow !== dayCanonical(diaSel)) return false;
+      }
+
+      return true;
+    });
+  }
+
+  // ===== Delitos de Estudio (ahora textos “Eventos”) =====
+  function currentDateRange(){
+    var ds = fDesdeEl.value;
+    var hs = fHastaEl.value;
+    var d1 = ds ? new Date(ds + 'T00:00:00') : null;
+    var d2 = hs ? new Date(hs + 'T23:59:59') : null;
+    return [d1, d2];
+  }
+
+  function getFilteredDelitos(){
+    if (!Array.isArray(DELITOS_DATA)) return [];
+    var dr = currentDateRange();
+    var d1 = dr[0], d2 = dr[1];
+    var now = new Date();
+    return DELITOS_DATA.filter(function(p){
+      if (!p || !isFinite(p.lat) || !isFinite(p.lng)) return false;
+      if (!p.fecha || !isValidDate(p.fecha)) return true;
+      var f = new Date(p.fecha);
+      if (d1 && f < d1) return false;
+      if (d2 && f > d2) return false;
+      if (delitosDaysLimit != null) {
+        var diff = (now - f) / (1000*60*60*24);
+        if (diff > delitosDaysLimit) return false;
+      }
+      return true;
+    });
+  }
+
+  // ===== mapa =====
+  var map, baseOSM, sat, roads, heatLayer, centroidLayer, polygonLayer, eventsLayer, circleLayer, delitosLayer;
+  var filterChipCtrl = null, filterChipEl = null;
+
+  initMap();
+
+  function initMap(){
+    map = L.map('map').setView([-32.889, -68.845], 12);
+    baseOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+    map.createPane('pane-polys');     map.getPane('pane-polys').style.zIndex = 200; map.getPane('pane-polys').style.pointerEvents = 'none';
+    map.createPane('pane-circles');   map.getPane('pane-circles').style.zIndex = 210;
+    map.createPane('pane-events');    map.getPane('pane-events').style.zIndex = 220;
+    map.createPane('pane-delitos');   map.getPane('pane-delitos').style.zIndex = 230;
+    map.createPane('pane-centroids'); map.getPane('pane-centroids').style.zIndex = 300;
+
+    sat   = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']});
+    roads = L.tileLayer('https://{s}.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', {maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']});
+
+    document.getElementById('btnBase').onclick = function(){
+      map.addLayer(baseOSM); map.removeLayer(sat); map.removeLayer(roads);
+      setBtnState('btnBase', true); setBtnState('btnHybrid', false);
+    };
+    document.getElementById('btnHybrid').onclick = function(){
+      map.removeLayer(baseOSM); sat.addTo(map); roads.addTo(map);
+      setBtnState('btnBase', false); setBtnState('btnHybrid', true);
+    };
+
+    document.getElementById('btnHeat').onclick = function(){
+      if (heatLayer) {
+        map.removeLayer(heatLayer); heatLayer=null; setBtnState('btnHeat', false);
+      } else {
+        heatLayer = L.heatLayer(buildHeatDataDelitos(filteredDelitosDays), {radius:HEAT_RADIUS, blur:15, maxZoom:18}).addTo(map);
+        setBtnState('btnHeat', true);
+      }
+    };
+    document.getElementById('btnPolys').onclick = function(){
+      if (!polygonLayer) return;
+      if (map.hasLayer(polygonLayer)) { map.removeLayer(polygonLayer); setBtnState('btnPolys', false); }
+      else { polygonLayer.addTo(map); setBtnState('btnPolys', true); }
+    };
+    document.getElementById('btnCircles').onclick = function(){
+      if (!circleLayer) return;
+      if (map.hasLayer(circleLayer)) { map.removeLayer(circleLayer); setBtnState('btnCircles', false); }
+      else { circleLayer.addTo(map); setBtnState('btnCircles', true); }
+    };
+    document.getElementById('btnDelitos').onclick = function(){
+      if (!delitosLayer) delitosLayer = makeDelitosLayer(filteredDelitosDays);
+      if (map.hasLayer(delitosLayer)) { map.removeLayer(delitosLayer); setBtnState('btnDelitos', false); }
+      else { delitosLayer.addTo(map); setBtnState('btnDelitos', true); }
+    };
+
+    filterChipCtrl = L.control({position:'topright'});
+    filterChipCtrl.onAdd = function(){
+      filterChipEl = L.DomUtil.create('div', 'filter-chip leaflet-control');
+      filterChipEl.style.display = 'none';
+      filterChipEl.innerHTML = '';
+      return filterChipEl;
+    };
+    filterChipCtrl.addTo(map);
+
+    renderMap(filterRows());
+
+    setBtnState('btnBase', true);
+    setBtnState('btnHybrid', false);
+    setBtnState('btnPolys', true);
+    setBtnState('btnCircles', true);
+    setBtnState('btnDelitos', false);
+    setBtnState('btnHeat', false);
+  }
+
+  function buildHeatDataDelitos(arr){
+    return (arr||[]).filter(function(p){ return isFinite(p.lat) && isFinite(p.lng); }).map(function(p){ return [p.lat, p.lng, 1]; });
+  }
+
+  function makeDelitosLayer(arr){
+    const g = L.layerGroup();
+    (arr||[]).forEach(function(p){
+      if (!isFinite(p.lat) || !isFinite(p.lng)) return;
+      const t = '<b>' + (p.jurisdiccion||'') + '</b> — ' + ((p.evento||p.delito)||'') + (p.fecha? ('<br><i>'+fmtFecha(p.fecha)+'</i>') : '');
+      L.circleMarker([p.lat, p.lng], {
+        radius:POINT_RADIUS, color:'#c0392b', weight:1, fillColor:'#e74c3c', fillOpacity:.8,
+        pane:'pane-delitos'
+      })
+      .bindTooltip(t, {direction:'top', offset:[0,-6]})
+      .addTo(g);
+    });
+    return g;
+  }
+
+  function renderMap(arr){
+    if (centroidLayer) { map.removeLayer(centroidLayer); }
+    if (polygonLayer)  { map.removeLayer(polygonLayer); }
+    if (eventsLayer)   { map.removeLayer(eventsLayer); }
+    if (circleLayer)   { map.removeLayer(circleLayer); }
+    if (delitosLayer)  { map.removeLayer(delitosLayer); }
+    if (heatLayer)     { map.removeLayer(heatLayer); heatLayer=null; }
+
+    centroidLayer = L.layerGroup().addTo(map);
+    polygonLayer  = L.layerGroup().addTo(map);
+    eventsLayer   = L.layerGroup().addTo(map);
+    circleLayer   = L.layerGroup().addTo(map);
+    delitosLayer  = makeDelitosLayer(filteredDelitosDays);
+
+    const bounds = [];
+
+    arr.forEach(function(r){
+      if (r.Poligono_WKT) {
+        try {
+          const gj = wellknown.parse(r.Poligono_WKT);
+          const poly = L.geoJSON(gj, {style:{color:'#0d6efd', weight:2, fillOpacity:.05}, interactive:false, pane:'pane-polys'}).addTo(polygonLayer);
+          try { bounds.push(poly.getBounds()); } catch(e){}
+        } catch(e){}
+      }
+
+      if (isFinite(r.Centroide_lat) && isFinite(r.Centroide_lng)) {
+        L.circleMarker([r.Centroide_lat, r.Centroide_lng], {
+          radius:6, color:'#0d6efd', weight:2, fillColor:'#0d6efd', fillOpacity:.7, pane:'pane-centroids'
+        })
+        .bindTooltip(buildTooltip(r), {direction:'top', offset:[0,-6]})
+        .addTo(centroidLayer);
+        bounds.push(L.latLngBounds([ [r.Centroide_lat, r.Centroide_lng], [r.Centroide_lat, r.Centroide_lng] ]));
+
+        const rad = (Number(r.Radio_m)||0) > 0 ? Number(r.Radio_m) : 450;
+        L.circle([r.Centroide_lat, r.Centroide_lng], {radius: rad, color:'#0d6efd', weight:1, fillOpacity:0.03, interactive:false, pane:'pane-circles'}).addTo(circleLayer);
+      }
+
+      if (r.Eventos_puntos) {
+        const pts = String(r.Eventos_puntos).split(/[|;]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+        pts.forEach(function(pt){
+          const nums = pt.match(/-?\d+(?:\.\d+)?/g);
+          if (!nums || nums.length<2) return;
+          const la = Number(nums[0]), ln = Number(nums[1]);
+          if (isFinite(la) && isFinite(ln)) {
+            L.circleMarker([la,ln], {radius:3, color:'#c0392b', weight:1, fillColor:'#e74c3c', fillOpacity:.6, pane:'pane-events'}).addTo(eventsLayer);
+          }
+        });
+      }
+    });
+
+    if (bounds.length) {
+      const all = bounds.reduce(function(acc,b){ return acc ? acc.extend(b) : b; }, null);
+      if (all) map.fitBounds(all.pad(0.15));
+      setBtnState('btnPolys', true);
+      setBtnState('btnCircles', true);
+      setBtnState('btnDelitos', false);
+      setBtnState('btnHeat', !!(heatLayer && map.hasLayer(heatLayer)));
+    }
+  }
+
+  /* === REEMPLAZO: Tooltip + Tabla (ASCII seguro) === */
+  function buildTooltip(r){
+    var zona   = r.Zona_centroide || '';
+    var calles = r.Calles_triangulacion || '';
+    var chip   = [r.Distrito, r.Comisaria].filter(function(x){return !!x;}).join(' / ');
+    var rangoOp= r.Rango_operativo_SAT || r.Rango_horario_total || '';
+    var confL  = r.Confiabilidad_leyenda ? ('<br><b>Confiabilidad:</b> ' + r.Confiabilidad_leyenda) : '';
+    var linkPat= r.Link_Patrullaje_URL ? ('<br><b>Patrullaje:</b> <a href="' + r.Link_Patrullaje_URL + '" target="_blank">Ver</a>') : '';
+    return '<div><b>' + chip + '</b><br>'
+         + '<b>Zona:</b> ' + zona + '<br>'
+         + '<b>Poligono:</b> ' + calles + '<br>'
+         + '<b>Horario operativo:</b> ' + rangoOp + '<br>'
+         + '<b>Radio:</b> ' + (r.Radio_m || '') + ' m - <b>Eventos:</b> ' + (r.Cantidad_eventos || 0)
+         + confL + linkPat + '</div>';
+  }
+
+  var TB = document.getElementById('tbody');
+
+  function renderTable(arr){
+    TB.innerHTML = '';
+    arr.forEach(function(r, idx){
+      var link    = r.Link_GMaps_URL ? '<a href="' + r.Link_GMaps_URL + '" target="_blank">Mapa</a>' : '';
+      var linkPat = r.Link_Patrullaje_URL ? '<a href="' + r.Link_Patrullaje_URL + '" target="_blank">Patrullaje</a>' : '';
+      var btnWA   = '<button class="btn btn-sm btn-whatsapp" onclick="shareWA(' + idx + ')">WhatsApp</button>';
+      var btnPDF  = '<button class="btn btn-sm btn-outline-dark" onclick="makePDF(' + idx + ')">PDF</button>';
+      var rangoOp = r.Rango_operativo_SAT || r.Rango_horario_total || '';
+
+      TB.innerHTML += ''
+        + '<tr>'
+        +   '<td>' + (r.Distrito || '') + '</td>'
+        +   '<td>' + (r.Comisaria || '') + '</td>'
+        +   '<td>' + (r.Zona_centroide || '') + '</td>'
+        +   '<td>' + (r.Franja || '') + '</td>'
+        +   '<td>' + (rangoOp || '') + '</td>'
+        +   '<td>' + (r.Radio_m || '') + '</td>'
+        +   '<td>' + (r.Cantidad_eventos || 0) + '</td>'
+        +   '<td class="d-flex gap-1 flex-wrap">' + link + ' ' + linkPat + ' ' + btnWA + ' ' + btnPDF + '</td>'
+        + '</tr>';
+    });
+  }
+
+  function updateFilterChip(){
+    if (!filterChipEl) return;
+
+    const parts = [];
+    const elDia    = document.getElementById('fDia');     const diaSel    = (elDia && elDia.value) || '';
+    const elFran   = document.getElementById('fFranja');  const franjaSel = (elFran && elFran.value) || '';
+    const elComis  = document.getElementById('fComis');   const comisSel  = (elComis && elComis.value) || '';
+    const elVent   = document.getElementById('fVentana'); const ventVal   = (elVent && elVent.value) || '';
+    const elDesde  = document.getElementById('fDesde');   const ds        = (elDesde && elDesde.value) || '';
+    const elHasta  = document.getElementById('fHasta');   const hs        = (elHasta && elHasta.value) || '';
+
+    if (diaSel)    parts.push(diaSel);
+    if (franjaSel) parts.push(franjaSel);
+    if (comisSel)  parts.push('Distrito: ' + comisSel);
+    if (ds || hs) {
+      const fmt = function(s){ try { return new Date(s).toLocaleDateString('es-AR'); } catch(e){ return s; } };
+      const rango = (ds? fmt(ds):'') + ((ds||hs)? ' – ' : '') + (hs? fmt(hs):'');
+      parts.push(rango.trim());
+    }
+    if (ventVal) {
+      const labelmap = { '1':'24 hs', '2':'48 hs', '3':'72 hs', '7':'7 días', '15':'15 días' };
+      parts.push('Eventos: ' + (labelmap[ventVal] || (ventVal + ' días')));
+    }
+
+    if (parts.length){
+      filterChipEl.innerHTML = '<b>Filtro:</b> ' + parts.join(' • ');
+      filterChipEl.style.display = '';
+    } else {
+      filterChipEl.style.display = 'none';
+      filterChipEl.innerHTML = '';
+    }
+  }
+
+  function renderAll(){
+    const arr = filterRows();
+    LAST_ROWS = arr.slice();
+
+    filteredDelitosDays = getFilteredDelitos();
+
+    renderMap(arr);
+    const kA = arr.length;
+    const kE = arr.reduce(function(a,r){ return a + (Number(r.Cantidad_eventos)||0); }, 0);
+    document.getElementById('kpiAlertas').textContent = kA;
+    document.getElementById('kpiEventos').textContent = kE;
+    renderTable(arr);
+
+    const elDia = document.getElementById('fDia');
+    const diaSel = (elDia && elDia.value) || '';
+    const kpiDia = document.getElementById('kpiDia');
+    const kpiDiaVal = document.getElementById('kpiDiaVal');
+    if (kpiDia && kpiDiaVal) {
+      if (diaSel) { kpiDiaVal.textContent = diaSel; kpiDia.classList.remove('d-none'); }
+      else { kpiDia.classList.add('d-none'); kpiDiaVal.textContent = ''; }
+    }
+
+    updateFilterChip();
+  }
+
+  // =======================
+  // WhatsApp – Formato + Ruta sugerida
+  // =======================
+  function waEmoji(name){
+    if (name === 'shield') return '🛡️ ';
+    if (name === 'pin')    return '📍 ';
+    if (name === 'road')   return '🛣️ ';
+    return '';
+  }
+
+  // Ruta sugerida (RegExp constructor: seguro dentro de template literal)
+  function buildRutaSugerida(pol){
+    var s = String(pol||'').trim();
+    if (!s) return 's/d';
+    // \s -> s ; \/ -> / ; \\| -> |
+    var sep = new RegExp("\\s*(?:\/|->|→|\\|;)\\s*");
+    var pts = s.split(sep).filter(function(x){ return !!x; });
+    if (!pts.length) return 's/d';
+    if (pts.length === 1) return 'Punto fijo: ' + pts[0];
+    return pts.join(' -> ') + ' -> ' + pts[0] + ' (circuito)';
+  }
+
+  // Sanitizador ASCII para WhatsApp
+  function sanitizeASCII(s){
+    s = String(s||'');
+    s = s.replace(/[�-�][�-�]/g,''); // emojis tipo surrogate
+    s = s.replace(/[️‍]/g,'');                 // variation selector / ZWJ
+    s = s.replace(/ /g,' ').replace(/[–—]/g,'-');   // NBSP y guiones largos
+    return s.trim();
+  }
+
+  function bestLink(r){
+    return r.Link_GMaps_URL || r.Link_Patrullaje_URL || 's/d';
+  }
+
+  // WhatsApp por fila
+  window.shareWA = function(idx){
+    var r = LAST_ROWS[idx];
+    if (!r) return;
+
+    var chip    = sanitizeASCII([r.Distrito, r.Comisaria].filter(Boolean).join(' / ') || 's/d');
+    var dia     = sanitizeASCII(r.Día || r.Dia || 's/d');
+    var franja  = sanitizeASCII(r.Franja || 's/d');
+    var rangoOp = sanitizeASCII(r.Rango_operativo_SAT || r.Rango_horario_total || 's/d');
+    var confTxt = sanitizeASCII(r.Confiabilidad_leyenda || 's/d');
+    var zona    = sanitizeASCII(r.Zona_centroide || 's/d');
+    var radio   = sanitizeASCII(String(r.Radio_m || 0)) + ' m';
+    var ruta    = sanitizeASCII(buildRutaSugerida(r.Calles_triangulacion || ''));
+    var link    = sanitizeASCII(bestLink(r));
+
+    var lines = [
+      '🛡️ PATRULLAJE SAT - ' + (chip || 's/d') + '',
+      '_____________',
+      'Orden de Policiamiento:',
+      'Día: ' + dia + '  ·  Franja: ' + franja,
+      'Rango operativo: ' + rangoOp + ' - Confiabilidad: ' + confTxt,
+      '📍 Zona: ' + zona + ' - Radio: ' + radio,
+      '🛣️ Ruta sugerida: ' + ruta,
+      'Instrucciones: Patrullar cada 20 min con detención breve y balizas encendidas.',
+      'Clic Ver Patrullaje Sugerido: ' + link,
+      'Observaciones: Velocidad sugerida 20 km/h. Reportar novedades en SAT y a su superior.'
+    ];
+
+    var msg = lines.join('\n');
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  };
+
+  // ===== PDF por fila =====
+  window.makePDF = async function(idx){
+    const r = LAST_ROWS[idx];
+    if (!r) return;
+    const rangoOp = r.Rango_operativo_SAT || r.Rango_horario_total || '';
+    const confL = r.Confiabilidad_leyenda ? ('<div><b>Confiabilidad:</b> '+r.Confiabilidad_leyenda+'</div>') : '';
+    const box = document.createElement('div');
+    box.style.position='fixed'; box.style.top='-9999px'; box.style.left='-9999px';
+    box.style.width='600px'; box.style.padding='16px'; box.style.background='#fff'; box.style.border='1px solid #ddd';
+    box.innerHTML = `
+      <h5>SAT – Sistema de Análisis Territorial</h5>
+      <div><b>Distrito/Comisaría:</b> ${[r.Distrito,r.Comisaria].filter(Boolean).join(' / ')}</div>
+      <div><b>Zona:</b> ${r.Zona_centroide}</div>
+      <div><b>Polígono:</b> ${r.Calles_triangulacion}</div>
+      <div><b>Horario operativo:</b> ${rangoOp}</div>
+      <div><b>Radio (m):</b> ${r.Radio_m || ''} · <b>Eventos:</b> ${r.Cantidad_eventos || 0}</div>
+      <div><b>Mapa:</b> ${r.Link_GMaps_URL ? r.Link_GMaps_URL : (r.Link_Patrullaje_URL ? r.Link_Patrullaje_URL : '(s/d)')} </div>
+      ${confL}
+      <br>
+      <div>📝 <b>Directiva:</b><br>Patrullar cada 20 min con detención breve y balizas encendidas.</div>
+      <div>━━━━━━━━━━</div>
+      <div>⚠️ Recuerda patrullar a 20 km/h y reportar novedades en SAT y a tu Superior</div>
+      <br><div class="small">© SAT – Oficina de Estadísticas y Análisis Delictual y Operacional</div>
+    `;
+    document.body.appendChild(box);
+    const canvas = await html2canvas(box);
+    document.body.removeChild(box);
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p','pt','a4');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const ratio = (pageW - 40) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 20, 20, canvas.width*ratio, canvas.height*ratio);
+    pdf.save('SAT_Patrullaje_'+(r.Distrito||'')+'_'+(r.Zona_centroide||'')+'.pdf');
+  };
+
+  // Render inicial
+  renderAll();
   </script>
-  -->
+
 </body>
 </html>
-
